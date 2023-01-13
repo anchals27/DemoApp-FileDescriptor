@@ -29,6 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="@{modelData.fileName}"
+            android:textSize="20dp"
             android:textColor="@color/black"
             app:layout_constraintStart_toEndOf="@id/myImage"
             app:layout_constraintTop_toTopOf="@id/myImage" />
