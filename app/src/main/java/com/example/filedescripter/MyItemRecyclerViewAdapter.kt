@@ -1,11 +1,16 @@
 package com.example.filedescripter
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import com.example.filedescripter.databinding.ListItemBinding
 
-class MyAdapter(private val fileList : List<MyDataClass>?) : RecyclerView.Adapter<BaseViewHolder>() {
+/**
+ * [RecyclerView.Adapter] that can display a [PlaceholderItem].
+ * TODO: Replace the implementation with code for your data type.
+ */
+class MyItemRecyclerViewAdapter(private val fileList : List<MyDataClass>?) : RecyclerView.Adapter<BaseViewHolder>() {
     class ListItemVH(val myView: ListItemBinding) : BaseViewHolder(myView.root) {
         override fun bindData(position: Int, data: Any) {
             myView.modelData = data as MyDataClass

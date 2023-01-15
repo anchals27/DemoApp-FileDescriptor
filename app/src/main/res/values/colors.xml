@@ -10,4 +10,8 @@
     <color name="red">#EF0606</color>
     <color name="yellow">#FFEB3B</color>
     <color name="green">#3DEF0D</color>
+
+    <color name="grey">#aaa</color>
+    <color name="button_color">#1E573B</color>
+
 </resources>

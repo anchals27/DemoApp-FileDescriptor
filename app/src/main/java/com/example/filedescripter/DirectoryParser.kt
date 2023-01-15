@@ -10,15 +10,12 @@ class DirectoryParser(val dbHelper: DBHelper) {
 
     fun doParsingOfInternalStorage(locationServiceProvider: LocationServiceProvider) : List<MyDataClass> {
 
-        Log.d(TAG, "doParsingOfInternalStorage: Hitting Here")
         var list = mutableListOf<MyDataClass>()
+        val location = locationServiceProvider.getLastLocation()
+        Log.d(TAG, "Anchal: doParsingOfInternalStorage: at ${location}")
 
         File(DEFAULT_PATH).walk().forEach {
-            // Make Entry to the DB
-            val data = MyDataClass(it.name, it.parent + "/", it.extension, "", it.totalSpace.toString())
-//            Log.d(TAG, "Anchal: DirectoryParser: name: ${it.name}," +
-//                    " path: ${it.parent} size: ${it.totalSpace / (1024 * 1024 * 8)} KB, Type: ${it.extension}")
-
+            val data = MyDataClass(it.name, it.parent + "/", it.extension, location, it.totalSpace.toString())
             list.add(data)
             dbHelper.writeFileInfoToDB(data)
         }
@@ -26,6 +23,6 @@ class DirectoryParser(val dbHelper: DBHelper) {
     }
 
     private fun getLocation(locationServiceProvider: LocationServiceProvider) : String {
-        return ""
+        return locationServiceProvider.getLastLocation()
     }
 }

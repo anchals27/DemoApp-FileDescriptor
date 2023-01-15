@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,10 +7,25 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <TextView
+        android:id="@+id/addressBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </androidx.recyclerview.widget.RecyclerView>
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        />
 
-</LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/container"
+        android:layout_above="@+id/bottom_navigation_bar"
+        android:layout_below="@+id/addressBar"/>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bottom_navigation_bar"
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/bottom_nav_menu"/>
+
+</RelativeLayout>

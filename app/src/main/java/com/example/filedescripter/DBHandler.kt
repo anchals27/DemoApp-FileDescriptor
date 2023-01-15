@@ -18,6 +18,8 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     override fun onCreate(db: SQLiteDatabase) {
         // below is a sqlite query, where column names
         // along with their data types is given
+        Log.d(TAG, "Anchal: onCreate: Dropping table")
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME)
         val query = ("CREATE TABLE " + TABLE_NAME + " ("
                 + FILE_NAME + " TEXT," +
                 FILE_PATH + " TEXT," +
@@ -28,13 +30,12 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         // we are calling sqlite
         // method for executing our query
         db.execSQL(query)
-        Log.d(TAG, "Anchal: query: $query")
+//        Log.d(TAG, "Anchal: query: $query")
         Log.d(TAG, "Anchal: onCreate: DB Creation Successfully")
     }
 
     override fun onUpgrade(db: SQLiteDatabase, p1: Int, p2: Int) {
         // this method is to check if table already exists
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME)
         Log.d(TAG, "Anchal: onUpgrade: Dropping table and creating new one")
         onCreate(db)
     }
@@ -84,18 +85,18 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
 //         Log.d(TAG, "Anchal: getContentsFromDB: ${}")
         if (cursor!!.moveToFirst()) {
             do {
-                Log.d(TAG, "Anchal: getContentsFromDB: ${cursor.getColumnIndex(FILE_NAME)}")
+//                Log.d(TAG, "Anchal: getContentsFromDB: ${cursor.getColumnIndex(FILE_NAME)}")
                 if (cursor.getColumnIndex(FILE_NAME) < 0 ||
                     cursor.getColumnIndex(FILE_PATH) < 0 ||
                     cursor.getColumnIndex(FILE_SIZE) < 0 ||
                     cursor.getColumnIndex(FILE_TYPE) < 0 ||
                     cursor.getColumnIndex(FILE_LOCATION) < 0) {
-                    Log.d(TAG, "Anchal: getContentsFromDB: cursor < 0, col_count: ${cursor.columnCount}")
+//                    Log.d(TAG, "Anchal: getContentsFromDB: cursor < 0, col_count: ${cursor.columnCount}")
                     return listOf(MyDataClass("Oops! You Ran into a problem, Col index < 0!!"))
                 } else {
                     val index = cursor.getColumnIndex(FILE_PATH)
 //                    Log.d(TAG, "Anchal: one reading adding ${index}")
-                    Log.d(TAG, "Anchal: Cursor getString: ${cursor.getString(index)} -- $curDirectory")
+//                    Log.d(TAG, "Anchal: Cursor getString: ${cursor.getString(index)} -- $curDirectory")
 //                    if (cursor.getString(index) + "/" == curDirectory)
                     list.add(
                         MyDataClass(

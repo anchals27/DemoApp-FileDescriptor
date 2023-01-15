@@ -1,10 +1,11 @@
 package com.example.filedescripter
 
 // import android.Manifest
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.sqlite.SQLiteDatabase
+import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
@@ -12,39 +13,38 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.util.Log
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class MainActivity : AppCompatActivity() {
 
     private var locationServiceProvider : LocationServiceProvider? = null
-    private var dbHelper : DBHelper = DBHelper(this, null)
+    private var dbHelper : DBHelper? = null
     private val STORAGE_PERMISSION_CODE = 101
     private var isDBLoaded = false
     private var curPath = "/"
+    lateinit var locationManager: LocationManager
+
+    private var explorerFragment : ExplorerFragment? = null
+    private var analyticsFragment : AnalyticsFragment? = null
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
-        supportActionBar!!.setTitle("File Descriptor")
+        supportActionBar!!.title = "File Descriptor"
         Log.d(TAG, "Anchal: onCreate: OnCreate being called ********************")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         curPath = "/storage/self/primary/"
-    }
+        dbHelper = DBHelper(this, null)
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
 
-    private fun createAdapterForRecyclerView(list: List<MyDataClass>?) : MyAdapter {
-        return MyAdapter(list)
-    }
-
-    private fun createRecyclerView(adapter: MyAdapter) {
-        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
+        val addressBar = findViewById<TextView>(R.id.addressBar)
+        addressBar.text = curPath
     }
 
     override fun onRequestPermissionsResult(
@@ -102,24 +102,49 @@ class MainActivity : AppCompatActivity() {
     private fun doStartupProcesses() {
         createLocationService()
         doLoadingOfDB()
-        var list : List<MyDataClass>? = doReadingOfDB()
-        createRecyclerView(createAdapterForRecyclerView(list))
+        setUpFragments(doReadingOfDB())
+    }
+
+    private fun setUpFragments(list: List<MyDataClass>?) {
+        explorerFragment = ExplorerFragment(list!!)
+        analyticsFragment = AnalyticsFragment()
+        supportFragmentManager.beginTransaction().replace(R.id.container, explorerFragment!!).commit()
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_bar)
+        bottomNavigationView.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.Explorer -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.container, explorerFragment!!).commit()
+                    true
+                }
+                R.id.Analytics -> {
+                    supportFragmentManager.beginTransaction().replace(
+                        R.id.container,
+                        analyticsFragment!!
+                    ).commit()
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     private fun doReadingOfDB() : List<MyDataClass> {
-        return dbHelper.getContentsFromDB(curPath)
+        return dbHelper!!.getContentsFromDB(curPath)
     }
 
     private fun createLocationService() {
-        var fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        locationServiceProvider = LocationServiceProvider(this, fusedLocationClient, this)
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        locationServiceProvider = LocationServiceProvider(this, fusedLocationClient, this, locationManager)
     }
 
     private fun doLoadingOfDB() {
         if (!isDBLoaded) {
             isDBLoaded = true
-            DirectoryParser(dbHelper).doParsingOfInternalStorage(locationServiceProvider!!)
+            Log.d(TAG, "Anchal: doLoadingOfDB: Loading")
+            DirectoryParser(dbHelper!!).doParsingOfInternalStorage(locationServiceProvider!!)
         } else {
+            Log.d(TAG, "Anchal: doLoadingOfDB: Loading avoided")
             Toast.makeText(this, "Database already loaded", Toast.LENGTH_SHORT).show()
         }
     }

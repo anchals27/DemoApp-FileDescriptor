@@ -29,13 +29,17 @@
 
     </application>
     <!-- Always include this permission -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <!-- Include only if your app benefits from precise location access. -->
+    <!-- Permissions for location access. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
+    <!-- Permissions for manage location access. -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+
+    <!-- Permissions for internet usage. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>
