@@ -1,9 +1,10 @@
 package com.example.filedescripter
 
-import android.Manifest
+// import android.Manifest
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
@@ -21,25 +22,22 @@ import com.google.android.gms.location.LocationServices
 
 class MainActivity : AppCompatActivity() {
 
-    var locationServiceProvider : LocationServiceProvider? = null
+    private var locationServiceProvider : LocationServiceProvider? = null
+    private var dbHelper : DBHelper = DBHelper(this, null)
     private val STORAGE_PERMISSION_CODE = 101
-    var isDBLoaded = false
-    var DEFAULT_PATH: String = "/storage/self/primary/"
-    val requiredPermissions = arrayOf(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+    private var isDBLoaded = false
+    private var curPath = "/"
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "Anchal: onCreate: OnCreate being called ********************")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        curPath = "/storage/self/primary/"
     }
 
-    private fun loadDatabase(list: List<MyDataClass>) {
-        TODO("Not yet implemented")
-    }
-
-    private fun createAdapterForRecyclerView() : MyAdapter {
-        return MyAdapter(fileList)
+    private fun createAdapterForRecyclerView(list: List<MyDataClass>?) : MyAdapter {
+        return MyAdapter(list)
     }
 
     private fun createRecyclerView(adapter: MyAdapter) {
@@ -55,7 +53,6 @@ class MainActivity : AppCompatActivity() {
     ) {
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         if (requestCode == STORAGE_PERMISSION_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Storage Permission Granted", Toast.LENGTH_SHORT).show()
@@ -104,20 +101,24 @@ class MainActivity : AppCompatActivity() {
     private fun doStartupProcesses() {
         createLocationService()
         doLoadingOfDB()
-        createRecyclerView(createAdapterForRecyclerView())
+        var list : List<MyDataClass>? = doReadingOfDB()
+        createRecyclerView(createAdapterForRecyclerView(list))
+    }
+
+    private fun doReadingOfDB() : List<MyDataClass> {
+        return dbHelper.getContentsFromDB(curPath)
     }
 
     private fun createLocationService() {
         var fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        locationServiceProvider = LocationServiceProvider(this, fusedLocationClient, this);
+        locationServiceProvider = LocationServiceProvider(this, fusedLocationClient, this)
     }
 
     private fun doLoadingOfDB() {
         if (!isDBLoaded) {
-            DirectoryParser().doParsingOfInternalStorage(locationServiceProvider!!)
             isDBLoaded = true
+            DirectoryParser(dbHelper).doParsingOfInternalStorage(locationServiceProvider!!)
         } else {
-            DirectoryParser().doParsingOfInternalStorage(locationServiceProvider!!)
             Toast.makeText(this, "Database already loaded", Toast.LENGTH_SHORT).show()
         }
     }

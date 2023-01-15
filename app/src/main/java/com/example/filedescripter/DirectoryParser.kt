@@ -5,25 +5,24 @@ import android.os.Environment
 import android.util.Log
 import java.io.File
 
-class DirectoryParser {
-    var DEFAULT_PATH: String = "/storage/self/primary/"
+class DirectoryParser(val dbHelper: DBHelper) {
+    private val DEFAULT_PATH: String = "/storage/self/primary/"
 
     fun doParsingOfInternalStorage(locationServiceProvider: LocationServiceProvider) : List<MyDataClass> {
+
         Log.d(TAG, "doParsingOfInternalStorage: Hitting Here")
         var list = mutableListOf<MyDataClass>()
-        val path = Environment.getExternalStorageDirectory().toString() + "/Documents"
+
         File(DEFAULT_PATH).walk().forEach {
             // Make Entry to the DB
-            if (it.isDirectory)
-                Log.d(TAG, "DirectoryParser: doParsingOfInternalStorage: Directory $it, size: ${it.totalSpace / (1024 * 1024 * 8)} KB, Type: Folder")
-            else
-                Log.d(TAG, "DirectoryParser: doParsingOfInternalStorage: File      $it, size: ${it.totalSpace / (1024 * 1024 * 8)} KB, Type: ${it.extension}")
-        }
-        return fileList
-    }
+            val data = MyDataClass(it.name, it.parent + "/", it.extension, "", it.totalSpace.toString())
+//            Log.d(TAG, "Anchal: DirectoryParser: name: ${it.name}," +
+//                    " path: ${it.parent} size: ${it.totalSpace / (1024 * 1024 * 8)} KB, Type: ${it.extension}")
 
-    private fun getFileType(it: File) : String {
-        return it.extension
+            list.add(data)
+            dbHelper.writeFileInfoToDB(data)
+        }
+        return list
     }
 
     private fun getLocation(locationServiceProvider: LocationServiceProvider) : String {
