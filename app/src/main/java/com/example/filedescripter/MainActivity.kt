@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
+        supportActionBar!!.setTitle("File Descriptor")
         Log.d(TAG, "Anchal: onCreate: OnCreate being called ********************")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

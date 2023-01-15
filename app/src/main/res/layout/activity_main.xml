@@ -7,18 +7,6 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:text="Pie Chart Will go Here"
-            />
-    </androidx.cardview.widget.CardView>
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
