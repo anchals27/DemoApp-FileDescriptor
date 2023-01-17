@@ -1,5 +1,7 @@
 package com.example.filedescripter
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +12,7 @@ import com.example.filedescripter.databinding.ListItemBinding
  * [RecyclerView.Adapter] that can display a [PlaceholderItem].
  * TODO: Replace the implementation with code for your data type.
  */
-class MyItemRecyclerViewAdapter(private val fileList : List<MyDataClass>?) : RecyclerView.Adapter<BaseViewHolder>() {
+class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>) : RecyclerView.Adapter<BaseViewHolder>() {
     class ListItemVH(val myView: ListItemBinding) : BaseViewHolder(myView.root) {
         override fun bindData(position: Int, data: Any) {
             myView.modelData = data as MyDataClass
@@ -23,15 +25,17 @@ class MyItemRecyclerViewAdapter(private val fileList : List<MyDataClass>?) : Rec
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-        if (fileList == null)
-            holder.bindData(position, MyDataClass("NULL"))
-        else
             holder.bindData(position, fileList[position])
     }
 
     override fun getItemCount(): Int {
-        if (fileList == null)
-            return 0
         return fileList.size
+    }
+
+    fun updateList(list: List<MyDataClass>) {
+        this.fileList.clear()
+        Log.d(TAG, "Anchal: updateList: $list")
+        this.fileList.addAll(list)
+        notifyDataSetChanged()
     }
 }

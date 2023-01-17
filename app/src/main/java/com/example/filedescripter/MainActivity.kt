@@ -1,8 +1,9 @@
 package com.example.filedescripter
 
 // import android.Manifest
-import android.annotation.SuppressLint
+import android.Manifest
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
@@ -13,10 +14,15 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.util.Log
+import android.view.Menu
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.location.LocationManagerCompat.isLocationEnabled
+import com.example.filedescripter.MyApplication.Companion.Instance
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -24,14 +30,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 class MainActivity : AppCompatActivity() {
 
     private var locationServiceProvider : LocationServiceProvider? = null
-    private var dbHelper : DBHelper? = null
     private val STORAGE_PERMISSION_CODE = 101
     private var isDBLoaded = false
-    private var curPath = "/"
-    lateinit var locationManager: LocationManager
-
-    private var explorerFragment : ExplorerFragment? = null
-    private var analyticsFragment : AnalyticsFragment? = null
+    private var curPath = "/storage/self/primary/"
+    private lateinit var locationManager: LocationManager
+    private lateinit var explorerFragment : ExplorerFragment
+    private lateinit var analyticsFragment : AnalyticsFragment
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,12 +43,11 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Anchal: onCreate: OnCreate being called ********************")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        curPath = "/storage/self/primary/"
-        dbHelper = DBHelper(this, null)
-        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-
+        createLocationService()
         val addressBar = findViewById<TextView>(R.id.addressBar)
         addressBar.text = curPath
+        explorerFragment = ExplorerFragment()
+        analyticsFragment = AnalyticsFragment()
     }
 
     override fun onRequestPermissionsResult(
@@ -65,6 +68,7 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun requestPermissionForManagingAllFiles() {
+        Toast.makeText(this, "Need Storage Permission", Toast.LENGTH_SHORT).show()
         Log.d(TAG, "Anchal: requestPermissionForManagingAllFiles: ${Environment.isExternalStorageManager()}")
         if (SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
@@ -76,38 +80,51 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun requestPermissionForLocation() {
+        Toast.makeText(this, "Need Location Permission", Toast.LENGTH_SHORT).show()
+        Log.d(TAG, "Anchal: requestPermissionForLocation: ")
+        if (SDK_INT >= Build.VERSION_CODES.R) {
+//            if (!Environment.isExternalStorageManager()) {
+                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+//                val uri: Uri = Uri.fromParts("package", packageName, null)
+//                intent.data = uri
+                startActivity(intent)
+//            }
+        }
+    }
+
+
+
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "Anchal: onStart")
-        if (Environment.isExternalStorageManager()) {
-            Log.d(TAG, "Anchal: onStart: All Permissions are granted")
-            doStartupProcesses()
-        } else {
-            Log.d(TAG, "Anchal: onStart: Requesting For Permission")
-            requestPermissionForManagingAllFiles()
+
+        if (!locationServiceProvider!!.isLocationPermissionGranted()) {
+            requestPermissionForLocation()
+            return
         }
-    }
 
-    override fun onRestart() {
-        super.onRestart()
-        Log.d(TAG, "Anchal: onRestart")
-    }
+        if (!Environment.isExternalStorageManager()) {
+            requestPermissionForManagingAllFiles()
+            return
+        }
 
-    override fun onResume() {
-        super.onResume()
-        Log.d(TAG, "Anchal: onResume")
+        if (!locationServiceProvider!!.isLocationEnabled()) {
+            locationServiceProvider!!.startIntentToEnableLocation()
+            return
+        }
+
+        Log.d(TAG, "Anchal: onStart: All Permissions are granted")
+        doStartupProcesses()
     }
 
     private fun doStartupProcesses() {
-        createLocationService()
         doLoadingOfDB()
-        setUpFragments(doReadingOfDB())
+        setUpFragments()
     }
 
-    private fun setUpFragments(list: List<MyDataClass>?) {
-        explorerFragment = ExplorerFragment(list!!)
-        analyticsFragment = AnalyticsFragment()
+    private fun setUpFragments() {
         supportFragmentManager.beginTransaction().replace(R.id.container, explorerFragment!!).commit()
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_bar)
         bottomNavigationView.setOnItemSelectedListener {
@@ -129,38 +146,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun doReadingOfDB() : List<MyDataClass> {
-        return dbHelper!!.getContentsFromDB(curPath)
-    }
-
     private fun createLocationService() {
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        locationServiceProvider = LocationServiceProvider(this, fusedLocationClient, this, locationManager)
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        locationServiceProvider = LocationServiceProvider(this, this, locationManager)
     }
 
     private fun doLoadingOfDB() {
         if (!isDBLoaded) {
             isDBLoaded = true
             Log.d(TAG, "Anchal: doLoadingOfDB: Loading")
-            DirectoryParser(dbHelper!!).doParsingOfInternalStorage(locationServiceProvider!!)
+            DirectoryParser.doParsingOfInternalStorage(locationServiceProvider!!)
         } else {
             Log.d(TAG, "Anchal: doLoadingOfDB: Loading avoided")
             Toast.makeText(this, "Database already loaded", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.d(TAG, "Anchal: onPause")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.d(TAG, "Anchal: onStop")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG, "Anchal: onDestroy")
     }
 }

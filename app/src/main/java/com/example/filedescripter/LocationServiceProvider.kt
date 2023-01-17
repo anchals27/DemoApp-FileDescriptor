@@ -2,6 +2,7 @@ package com.example.filedescripter
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
@@ -14,47 +15,39 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
-import com.google.android.gms.tasks.OnCompleteListener
 
 
 class LocationServiceProvider(
-        private val context: Context, private val fusedLocationProviderClient: FusedLocationProviderClient,
-        private val activity: MainActivity, val locationManager: LocationManager) {
-
+    private val context: Context, private val activity: MainActivity,
+    private val locationManager: LocationManager
+) {
+    private val LOCATION_NOT_AVAILABLE = ""
     val PERMISSION_ID = 44
-    private val LOCATION_NOT_AVAILABLE = "Location Not Available"
-    var currentLocation: Location? = null
+    private var currentLocation: Location? = null
 
     @SuppressLint("MissingPermission")
     fun getLastLocation(): String {
-        var myLocation = LOCATION_NOT_AVAILABLE
+        var myLocation: String
 
-        if (isLocationPermissionGranted()) {
-            if (isLocationEnabled()) {
-                val hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                Log.d(TAG, "Anchal: getLastLocation: $hasGps")
-                if (hasGps) {
-                    locationManager.requestLocationUpdates(
-                        LocationManager.GPS_PROVIDER,
-                        5000L,
-                        0f,
-                        android.location.LocationListener { location: Location -> currentLocation = location }
-                    )
-                }
+        if (!isLocationPermissionGranted() || !isLocationEnabled()) {
+            return LOCATION_NOT_AVAILABLE
+        }
 
-                val lastKnownLocationByGps =
-                    locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                Log.d(TAG, "Anchal: getLastLocation: $lastKnownLocationByGps")
-                lastKnownLocationByGps?.let {
-                    currentLocation = lastKnownLocationByGps
-                }
-            } else {
-                Toast.makeText(context, "Please turn on your location...", Toast.LENGTH_SHORT).show()
-                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                context.startActivity(intent)
-            }
-        } else {
-            requestPermission()
+        val hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        Log.d(TAG, "Anchal: getLastLocation: $hasGps")
+        if (hasGps) {
+            locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                5000L,
+                0f
+            ) { location: Location -> currentLocation = location }
+        }
+
+        val lastKnownLocationByGps =
+            locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        Log.d(TAG, "Anchal: getLastLocation: $lastKnownLocationByGps")
+        lastKnownLocationByGps?.let {
+            currentLocation = lastKnownLocationByGps
         }
 
         if (currentLocation == null) {
@@ -70,18 +63,19 @@ class LocationServiceProvider(
         return myLocation
     }
 
-    private fun isLocationPermissionGranted() : Boolean {
+    fun isLocationPermissionGranted() : Boolean {
         return ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     // Request for location permission
-    private fun requestPermission() {
+    fun requestPermissionForLocation() {
+        Log.d(TAG, "Anchal: requestPermissionForLocation: ")
         ActivityCompat.requestPermissions(
             activity, arrayOf(
                 Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -91,11 +85,19 @@ class LocationServiceProvider(
     }
 
     // Check if the location is enabled or not
-    private fun isLocationEnabled(): Boolean {
+    fun isLocationEnabled(): Boolean {
         val locationManager: LocationManager =
             context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
+
+    fun startIntentToEnableLocation() {
+        // Toast.makeText(this, "Please turn on your location...", Toast.LENGTH_SHORT).show()
+        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        context.startActivity(intent)
+    }
+
+
 
 }

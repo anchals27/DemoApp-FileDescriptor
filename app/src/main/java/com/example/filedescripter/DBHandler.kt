@@ -8,6 +8,8 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.log
 
 
@@ -22,6 +24,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME)
         val query = ("CREATE TABLE " + TABLE_NAME + " ("
                 + FILE_NAME + " TEXT," +
+                FILE_ID + " TEXT PRIMARY KEY," +
                 FILE_PATH + " TEXT," +
                 FILE_SIZE + " TEXT," +
                 FILE_TYPE + " TEXT," +
@@ -50,10 +53,11 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         // we are inserting our values
         // in the form of key-value pair
         values.put(FILE_NAME,       data.fileName)
+        values.put(FILE_ID,         data.fileId)
         values.put(FILE_PATH,       data.filePath)
-        values.put(FILE_SIZE,       data.fileSize)
         values.put(FILE_TYPE,       data.fileType)
         values.put(FILE_LOCATION,   data.fileLocation)
+        values.put(FILE_SIZE,       data.fileSize)
 
         val db = this.writableDatabase
         // the value of the database was very important at that time
@@ -79,9 +83,9 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     }
 
     @SuppressLint("Range")
-    fun getContentsFromDB(curDirectory: String) : List<MyDataClass> {
+    fun getContentsFromDB(curDirectory: String) : ArrayList<MyDataClass> {
         var cursor : Cursor = getDataFromDB(curDirectory)
-        var list = mutableListOf<MyDataClass>()
+        var list = ArrayList<MyDataClass>()
 //         Log.d(TAG, "Anchal: getContentsFromDB: ${}")
         if (cursor!!.moveToFirst()) {
             do {
@@ -92,7 +96,8 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
                     cursor.getColumnIndex(FILE_TYPE) < 0 ||
                     cursor.getColumnIndex(FILE_LOCATION) < 0) {
 //                    Log.d(TAG, "Anchal: getContentsFromDB: cursor < 0, col_count: ${cursor.columnCount}")
-                    return listOf(MyDataClass("Oops! You Ran into a problem, Col index < 0!!"))
+//                    return listOf(MyDataClass("Oops! You Ran into a problem, Col index < 0!!"))
+                    return ArrayList(listOf(MyDataClass("Oops! You Ran into a problem, Col index < 0!!")))
                 } else {
                     val index = cursor.getColumnIndex(FILE_PATH)
 //                    Log.d(TAG, "Anchal: one reading adding ${index}")
@@ -111,7 +116,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
                 }
             } while(cursor != null && cursor.moveToNext())
         } else {
-            return listOf(MyDataClass("Oops! You Ran into a problem!!, Cursor is null"))
+            return ArrayList(listOf(MyDataClass("Oops! You Ran into a problem!!, Cursor is null")))
         }
         cursor.close()
         return list
@@ -123,9 +128,10 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         private val DATABASE_VERSION = 1
         val TABLE_NAME = "files_table"
         val FILE_NAME = "file_name"
+        val FILE_ID = "file_id"
         val FILE_PATH = "file_path"
         val FILE_TYPE = "file_type"
-        val FILE_SIZE = "file_size"
         val FILE_LOCATION = "file_location"
+        val FILE_SIZE = "file_size"
     }
 }
