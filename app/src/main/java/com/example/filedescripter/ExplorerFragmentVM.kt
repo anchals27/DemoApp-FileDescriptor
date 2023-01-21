@@ -1,6 +1,7 @@
 package com.example.filedescripter
 
 import android.content.ContentValues.TAG
+import android.os.Environment
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.filedescripter.MyApplication.Companion.Instance
@@ -9,7 +10,7 @@ import kotlinx.coroutines.launch
 
 class ExplorerFragmentVM(private val explorerRepo: IExplorerRepo): ViewModel() {
 
-    private var curPath = "/storage/self/primary/"
+    private var curPath = Environment.getExternalStorageDirectory().path + "/"
     private val _listLiveData = MutableLiveData<List<MyDataClass>>(explorerRepo.getFilesInfoData(curPath))
 
     val listLiveData: LiveData<List<MyDataClass>>

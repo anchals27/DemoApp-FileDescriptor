@@ -2,7 +2,6 @@ package com.example.filedescripter
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
@@ -12,22 +11,19 @@ import android.location.LocationManager
 import android.os.Looper.*
 import android.provider.Settings
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 
 
 class LocationServiceProvider(
-    private val context: Context, private val activity: MainActivity,
-    private val locationManager: LocationManager
+    private val context: Context, private val locationManager: LocationManager
 ) {
     private val LOCATION_NOT_AVAILABLE = ""
-    val PERMISSION_ID = 44
     private var currentLocation: Location? = null
 
     @SuppressLint("MissingPermission")
     fun getLastLocation(): String {
-        var myLocation: String
+        val myLocation: String
 
         if (!isLocationPermissionGranted() || !isLocationEnabled()) {
             return LOCATION_NOT_AVAILABLE
@@ -71,17 +67,6 @@ class LocationServiceProvider(
             context,
             Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    // Request for location permission
-    fun requestPermissionForLocation() {
-        Log.d(TAG, "Anchal: requestPermissionForLocation: ")
-        ActivityCompat.requestPermissions(
-            activity, arrayOf(
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ), PERMISSION_ID
-        )
     }
 
     // Check if the location is enabled or not

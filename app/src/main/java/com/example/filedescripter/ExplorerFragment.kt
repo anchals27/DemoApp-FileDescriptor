@@ -1,24 +1,20 @@
 package com.example.filedescripter
 
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.filedescripter.databinding.FragmentItemListBinding
-import kotlin.math.log
 
 /**
  * A fragment representing a list of Items.
  */
-class ExplorerFragment() : Fragment() {
+class ExplorerFragment : Fragment() {
 
     private lateinit var _binding: FragmentItemListBinding
     private lateinit var _viewModel: ExplorerFragmentVM

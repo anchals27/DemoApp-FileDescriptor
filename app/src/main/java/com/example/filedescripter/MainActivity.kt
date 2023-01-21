@@ -1,9 +1,7 @@
 package com.example.filedescripter
 
 // import android.Manifest
-import android.Manifest
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
@@ -14,16 +12,10 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.util.Log
-import android.view.Menu
-import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.location.LocationManagerCompat.isLocationEnabled
-import com.example.filedescripter.MyApplication.Companion.Instance
-import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
@@ -32,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private var locationServiceProvider : LocationServiceProvider? = null
     private val STORAGE_PERMISSION_CODE = 101
     private var isDBLoaded = false
-    private var curPath = "/storage/self/primary/"
+    private var curPath = Environment.getExternalStorageDirectory().path + "/"
     private lateinit var locationManager: LocationManager
     private lateinit var explorerFragment : ExplorerFragment
     private lateinit var analyticsFragment : AnalyticsFragment
@@ -125,19 +117,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpFragments() {
-        supportFragmentManager.beginTransaction().replace(R.id.container, explorerFragment!!).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.container, explorerFragment).commit()
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_bar)
         bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.Explorer -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.container, explorerFragment!!).commit()
+                        .replace(R.id.container, explorerFragment).commit()
                     true
                 }
                 R.id.Analytics -> {
                     supportFragmentManager.beginTransaction().replace(
                         R.id.container,
-                        analyticsFragment!!
+                        analyticsFragment
                     ).commit()
                     true
                 }
@@ -148,7 +140,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun createLocationService() {
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-        locationServiceProvider = LocationServiceProvider(this, this, locationManager)
+        locationServiceProvider = LocationServiceProvider(this, locationManager)
     }
 
     private fun doLoadingOfDB() {
@@ -161,4 +153,6 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Database already loaded", Toast.LENGTH_SHORT).show()
         }
     }
+
+//    extern fun getAnalyticsFromCpp(str: String) : String
 }

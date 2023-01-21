@@ -10,7 +10,6 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.log
 
 
 class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
@@ -21,7 +20,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         // below is a sqlite query, where column names
         // along with their data types is given
         Log.d(TAG, "Anchal: onCreate: Dropping table")
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME)
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_NAME")
         val query = ("CREATE TABLE " + TABLE_NAME + " ("
                 + FILE_NAME + " TEXT," +
                 FILE_ID + " TEXT PRIMARY KEY," +
@@ -70,7 +69,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         // Log.d(TAG, "Anchal: Insert File into DB Successfully!")
     }
 
-    fun getDataFromDB(curDirectory: String): Cursor {
+    private fun getDataFromDB(curDirectory: String): Cursor {
          val db = this.readableDatabase
          val query = "SELECT * FROM $TABLE_NAME WHERE $FILE_PATH = '$curDirectory'"
 //         val query = "SELECT * FROM $TABLE_NAME"
@@ -84,10 +83,10 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
 
     @SuppressLint("Range")
     fun getContentsFromDB(curDirectory: String) : ArrayList<MyDataClass> {
-        var cursor : Cursor = getDataFromDB(curDirectory)
-        var list = ArrayList<MyDataClass>()
+        val cursor : Cursor = getDataFromDB(curDirectory)
+        val list = ArrayList<MyDataClass>()
 //         Log.d(TAG, "Anchal: getContentsFromDB: ${}")
-        if (cursor!!.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             do {
 //                Log.d(TAG, "Anchal: getContentsFromDB: ${cursor.getColumnIndex(FILE_NAME)}")
                 if (cursor.getColumnIndex(FILE_NAME) < 0 ||
@@ -99,7 +98,6 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
 //                    return listOf(MyDataClass("Oops! You Ran into a problem, Col index < 0!!"))
                     return ArrayList(listOf(MyDataClass("Oops! You Ran into a problem, Col index < 0!!")))
                 } else {
-                    val index = cursor.getColumnIndex(FILE_PATH)
 //                    Log.d(TAG, "Anchal: one reading adding ${index}")
 //                    Log.d(TAG, "Anchal: Cursor getString: ${cursor.getString(index)} -- $curDirectory")
 //                    if (cursor.getString(index) + "/" == curDirectory)
@@ -114,7 +112,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
                     )
 //                     Log.d(TAG, "Anchal: one reading adding done")
                 }
-            } while(cursor != null && cursor.moveToNext())
+            } while(cursor.moveToNext())
         } else {
             return ArrayList(listOf(MyDataClass("Oops! You Ran into a problem!!, Cursor is null")))
         }
