@@ -1,7 +1,8 @@
-package com.example.filedescripter
+package com.example.filedescripter.Services
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import com.example.filedescripter.MyDataClass
 
 class CppHelper : ICppHelper {
 

@@ -1,10 +1,13 @@
-package com.example.filedescripter
+package com.example.filedescripter.ViewModels
 
 import android.content.ContentValues.TAG
 import android.os.Environment
 import android.util.Log
 import androidx.lifecycle.*
+import com.example.filedescripter.Model.ExplorerRepo
+import com.example.filedescripter.Model.IExplorerRepo
 import com.example.filedescripter.MyApplication.Companion.Instance
+import com.example.filedescripter.MyDataClass
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

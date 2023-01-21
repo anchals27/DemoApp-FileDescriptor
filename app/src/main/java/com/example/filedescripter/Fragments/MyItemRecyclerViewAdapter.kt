@@ -1,10 +1,11 @@
-package com.example.filedescripter
+package com.example.filedescripter.Fragments
 
 import android.content.ContentValues.TAG
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.filedescripter.MyDataClass
 import com.example.filedescripter.databinding.ListItemBinding
 
 class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>) : RecyclerView.Adapter<BaseViewHolder>() {

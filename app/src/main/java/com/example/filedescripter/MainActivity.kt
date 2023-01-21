@@ -16,6 +16,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.example.filedescripter.Fragments.AnalyticsFragment
+import com.example.filedescripter.Fragments.ExplorerFragment
+import com.example.filedescripter.Services.DirectoryParser
+import com.example.filedescripter.Services.LocationServiceProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 

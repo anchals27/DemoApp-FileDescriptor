@@ -1,4 +1,4 @@
-package com.example.filedescripter
+package com.example.filedescripter.Fragments
 
 import android.content.ContentValues.TAG
 import android.graphics.Color
@@ -12,6 +12,8 @@ import androidx.lifecycle.ViewModelProviders
 import com.androidplot.pie.PieChart
 import com.androidplot.pie.Segment
 import com.androidplot.pie.SegmentFormatter
+import com.example.filedescripter.ViewModels.AnalyticsFragmentVM
+import com.example.filedescripter.R
 import com.example.filedescripter.databinding.FragmentAnalyticsBinding
 
 class AnalyticsFragment : Fragment() {

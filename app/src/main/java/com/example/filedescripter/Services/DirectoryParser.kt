@@ -1,9 +1,10 @@
-package com.example.filedescripter
+package com.example.filedescripter.Services
 
 import android.content.ContentValues.TAG
 import android.os.Environment
 import android.util.Log
 import com.example.filedescripter.MyApplication.Companion.Instance
+import com.example.filedescripter.MyDataClass
 import java.io.File
 
 class DirectoryParser {
