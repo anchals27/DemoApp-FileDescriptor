@@ -10,24 +10,36 @@ import java.io.File
 class DirectoryParser {
     companion object {
         private val DEFAULT_PATH: String = Environment.getExternalStorageDirectory().path + "/"
-        fun doParsingOfInternalStorage(locationServiceProvider: LocationServiceProvider) : List<MyDataClass> {
+        private lateinit var location : String
 
-            val list = mutableListOf<MyDataClass>()
-            val location = locationServiceProvider.getLastLocation()
-            Log.d(TAG, "Anchal: doParsingOfInternalStorage: at $location")
-
-            File(DEFAULT_PATH).walk().forEach {
-                val data = MyDataClass(it.name,
-                    (it.parent?.plus(it.name)).hashCode().toString(),
-                    it.parent?.plus("/") ?: DEFAULT_PATH,
-                    if (it.isFile) it.extension else it.name,
-                    location,
-                    it.totalSpace.toString())
-                list.add(data)
-                Instance.dbHelper.writeFileInfoToDB(data)
+        private fun doRecursiveWalkOnExternalStorage(file: File) : Long {
+            var size : Long = 0
+            file.listFiles()?.forEach {
+                if (it.isDirectory) {
+                    size += doRecursiveWalkOnExternalStorage(it)
+                } else {
+                    size += it.length()
+                    insertFileInfoToDB(it, it.length())
+                }
             }
-            Log.d(TAG, "Anchal: doParsingOfInternalStorage: $list")
-            return list
+            insertFileInfoToDB(file, size)
+            return size
+        }
+
+        private fun insertFileInfoToDB(it: File, size: Long) {
+            Log.d(TAG, "Anchal: insertFileInfoToDB: $it ${size.toString()}")
+            val data = MyDataClass(it.name,
+                (it.parent?.plus(it.name)).hashCode().toString(),
+                it.parent?.plus("/") ?: DEFAULT_PATH,
+                if (it.isFile) it.extension else it.name,
+                location,
+                size.toString())
+            Instance.dbHelper.writeFileInfoToDB(data)
+        }
+
+        fun doParsingOfInternalStorage(locationServiceProvider: LocationServiceProvider) {
+            location = locationServiceProvider.getLastLocation()
+            doRecursiveWalkOnExternalStorage(File(DEFAULT_PATH))
         }
     }
 }
