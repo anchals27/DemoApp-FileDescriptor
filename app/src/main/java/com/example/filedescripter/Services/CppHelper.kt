@@ -6,6 +6,14 @@ import com.example.filedescripter.MyDataClass
 
 class CppHelper : ICppHelper {
 
+    companion object {
+        init {
+            System.loadLibrary("filedescripter")
+        }
+
+        external fun getAnalysisFromCpp(string: String) : String
+    }
+
     private fun convertListToString(list: List<MyDataClass>) : String {
         var str = String()
         for (li in list) {
@@ -25,16 +33,13 @@ class CppHelper : ICppHelper {
     }
 
     override fun doAnalysisWithJNI(list: List<MyDataClass>) : Map<String, Long> {
-        val mapping : MutableMap<String, Long> =  mutableMapOf()
-        for (li in list) {
-            Log.d(TAG, "Anchal: doAnalysisWithJNI: ${li.fileName} ${li.fileType} and ${li.fileSize}")
-            if (mapping.containsKey(li.fileType)) {
-                mapping[li.fileType] = mapping[li.fileType]!! + li.fileSize.toLong()
-            } else {
-                mapping[li.fileType] = li.fileSize.toLong()
-            }
-        }
-        Log.d(TAG, "Anchal: doAnalysisWithJNI: $mapping")
+        val queryString = convertListToString(list)
+        Log.d(TAG, "Anchal: queryString: $queryString")
+        val resultString = getAnalysisFromCpp(queryString)
+
+        Log.d(TAG, "Anchal resultString: $resultString")
+        val mapping = convertStringToMap(resultString)
+        Log.d(TAG, "Anchal: mapping: $mapping")
         return mapping
     }
 }
