@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.ViewModels.ExplorerFragmentVM
 import com.example.filedescripter.databinding.FragmentItemListBinding
 
@@ -29,6 +30,7 @@ class ExplorerFragment : Fragment() {
         _binding = FragmentItemListBinding.inflate(inflater, container, false)
         ViewModelProviders.of(this, ExplorerFragmentVM.factory)[ExplorerFragmentVM::class.java]
             .also { _viewModel = it }
+
         return _binding.root
     }
 
@@ -46,6 +48,10 @@ class ExplorerFragment : Fragment() {
                 Log.d(TAG, "Anchal: onViewCreated: list is null")
             }
         }
+        _viewModel.getDirectoryList()
+    }
+
+    fun reloadList() {
         _viewModel.getDirectoryList()
     }
 

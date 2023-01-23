@@ -19,7 +19,7 @@ import com.example.filedescripter.databinding.FragmentAnalyticsBinding
 class AnalyticsFragment : Fragment() {
     private lateinit var _binding: FragmentAnalyticsBinding
     private lateinit var _viewModel: AnalyticsFragmentVM
-    private val colorList = listOf(Color.RED, Color.GREEN, Color.DKGRAY, Color.BLUE, Color.CYAN, Color.MAGENTA, Color.GRAY)
+    private val colorList = listOf(Color.RED, Color.GREEN, Color.DKGRAY, Color.BLUE, Color.MAGENTA, Color.GRAY)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,9 +42,13 @@ class AnalyticsFragment : Fragment() {
     private fun updatePieChart(mapping: Map<String, Long>, view: View) {
         var i = 0
         Log.d(TAG, "Anchal: updatePieChart: $mapping")
+        var totalSize : Long = 0
+        for ((key, value) in mapping) {
+            totalSize += value
+        }
         for ((key, value) in mapping) {
             Log.d(TAG, "Anchal: updatePieChart: $key, $value")
-            val segmentPair = Segment(key, value)
+            val segmentPair = Segment(key + " ${value * 100 / totalSize}%", value)
             val segmentColor = SegmentFormatter(colorList[i])
             val pieChart = view.findViewById<PieChart>(R.id.pieChart)
             pieChart.addSegment(segmentPair, segmentColor)
@@ -52,5 +56,4 @@ class AnalyticsFragment : Fragment() {
             i %= colorList.size
         }
     }
-
 }

@@ -19,10 +19,10 @@ class LocationServiceProvider(
     private val context: Context, private val locationManager: LocationManager
 ) {
     private val LOCATION_NOT_AVAILABLE = ""
-    private var currentLocation: Location? = null
 
     @SuppressLint("MissingPermission")
     fun getLastLocation(): String {
+        var currentLocation: Location? = null
         val myLocation: String
 
         if (!isLocationPermissionGranted() || !isLocationEnabled()) {
@@ -82,7 +82,4 @@ class LocationServiceProvider(
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         context.startActivity(intent)
     }
-
-
-
 }

@@ -3,6 +3,7 @@ package com.example.filedescripter.ViewModels
 import android.content.ContentValues.TAG
 import android.os.Environment
 import android.util.Log
+import android.widget.ImageButton
 import androidx.lifecycle.*
 import com.example.filedescripter.Model.ExplorerRepo
 import com.example.filedescripter.Model.IExplorerRepo
@@ -15,6 +16,7 @@ class ExplorerFragmentVM(private val explorerRepo: IExplorerRepo): ViewModel() {
 
     private var curPath = Environment.getExternalStorageDirectory().path + "/"
     private val _listLiveData = MutableLiveData<List<MyDataClass>>(explorerRepo.getFilesInfoData(curPath))
+//    private val imageButton =
 
     val listLiveData: LiveData<List<MyDataClass>>
         get() = _listLiveData

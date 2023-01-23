@@ -27,13 +27,13 @@ class DirectoryParser {
         }
 
         private fun insertFileInfoToDB(it: File, size: Long) {
-            Log.d(TAG, "Anchal: insertFileInfoToDB: $it ${size.toString()}")
             val data = MyDataClass(it.name,
-                (it.parent?.plus(it.name)).hashCode().toString(),
+                it.absolutePath.hashCode().toString(),
                 it.parent?.plus("/") ?: DEFAULT_PATH,
                 if (it.isFile) it.extension else it.name,
                 location,
                 size.toString())
+            Log.d(TAG, "Anchal: insertFileInfoToDB: $data ${it.absolutePath}")
             Instance.dbHelper.writeFileInfoToDB(data)
         }
 

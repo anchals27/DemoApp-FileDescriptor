@@ -8,6 +8,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -91,6 +92,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
 //                Log.d(TAG, "Anchal: getContentsFromDB: ${cursor.getColumnIndex(FILE_NAME)}")
                 if (cursor.getColumnIndex(FILE_NAME) < 0 ||
                     cursor.getColumnIndex(FILE_PATH) < 0 ||
+                    cursor.getColumnIndex(FILE_ID)   < 0 ||
                     cursor.getColumnIndex(FILE_SIZE) < 0 ||
                     cursor.getColumnIndex(FILE_TYPE) < 0 ||
                     cursor.getColumnIndex(FILE_LOCATION) < 0) {
@@ -104,6 +106,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
                     list.add(
                         MyDataClass(
                             fileName = cursor.getString(cursor.getColumnIndex(FILE_NAME)),
+                            fileId = cursor.getString(cursor.getColumnIndex(FILE_ID)),
                             filePath = cursor.getString(cursor.getColumnIndex(FILE_PATH)),
                             fileSize = cursor.getString(cursor.getColumnIndex(FILE_SIZE)),
                             fileType = cursor.getString(cursor.getColumnIndex(FILE_TYPE)),
@@ -118,6 +121,25 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         }
         cursor.close()
         return list
+    }
+
+    fun updateFileSizeInDB(file: File) {
+        Log.d(TAG, "Anchal: updateFileSizeInDB: $file")
+        val db = this.writableDatabase
+        val query = "UPDATE $TABLE_NAME " +
+                "SET $FILE_SIZE = ${file.length()} " +
+                "WHERE $FILE_ID = ${file.absolutePath.hashCode()}"
+        Log.d(TAG, "Anchal: Update Query: $query")
+        db.rawQuery(query, null)
+    }
+
+    fun deleteFileFromDB(file: File) {
+        Log.d(TAG, "Anchal: deleteFileFromDB: $file")
+        val db = this.writableDatabase
+        val query = "DELETE FROM $TABLE_NAME " +
+                "WHERE $FILE_ID = ${file.absolutePath.hashCode()}"
+        Log.d(TAG, "Anchal: Delete Query: $query")
+        db.rawQuery(query, null)
     }
 
     companion object{
