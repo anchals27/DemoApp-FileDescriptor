@@ -70,21 +70,23 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         // Log.d(TAG, "Anchal: Insert File into DB Successfully!")
     }
 
-    private fun getDataFromDB(curDirectory: String): Cursor {
-         val db = this.readableDatabase
-         val query = "SELECT * FROM $TABLE_NAME WHERE $FILE_PATH = '$curDirectory'"
+    private fun getDataFromDB(curDirectory: String, db: SQLiteDatabase): Cursor {
+//        val db = this.readableDatabase
+        val query = "SELECT * FROM $TABLE_NAME WHERE $FILE_PATH = '$curDirectory'"
 //         val query = "SELECT * FROM $TABLE_NAME"
-         Log.d(TAG, "Anchal: getDataFromDB: $query")
+        Log.d(TAG, "Anchal: getDataFromDB: $query")
 
 //        return db.query(TABLE_NAME, arrayOf(FILE_NAME), null,
 //            null, null, null, null)
 
-         return db.rawQuery(query, null)
+        //        db.close()
+        return db.rawQuery(query, null)
     }
 
     @SuppressLint("Range")
     fun getContentsFromDB(curDirectory: String) : ArrayList<MyDataClass> {
-        val cursor : Cursor = getDataFromDB(curDirectory)
+        val db = this.readableDatabase
+        val cursor : Cursor = getDataFromDB(curDirectory, db)
         val list = ArrayList<MyDataClass>()
 //         Log.d(TAG, "Anchal: getContentsFromDB: ${}")
         if (cursor.moveToFirst()) {
@@ -120,6 +122,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
             return ArrayList(listOf(MyDataClass("Oops! You Ran into a problem!!, Cursor is null")))
         }
         cursor.close()
+        db.close()
         return list
     }
 
@@ -128,18 +131,20 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         val db = this.writableDatabase
         val query = "UPDATE $TABLE_NAME " +
                 "SET $FILE_SIZE = ${file.length()} " +
-                "WHERE $FILE_ID = ${file.absolutePath.hashCode()}"
+                "WHERE $FILE_ID = '${file.absolutePath.hashCode()}'"
         Log.d(TAG, "Anchal: Update Query: $query")
-        db.rawQuery(query, null)
+        db.execSQL(query)
+        db.close()
     }
 
     fun deleteFileFromDB(file: File) {
-        Log.d(TAG, "Anchal: deleteFileFromDB: $file")
         val db = this.writableDatabase
         val query = "DELETE FROM $TABLE_NAME " +
                 "WHERE $FILE_ID = ${file.absolutePath.hashCode()}"
         Log.d(TAG, "Anchal: Delete Query: $query")
-        db.rawQuery(query, null)
+        db.execSQL(query)
+        Log.d(TAG, "Anchal: deleteFileFromDB: $file")
+        db.close()
     }
 
     companion object{

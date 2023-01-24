@@ -78,6 +78,7 @@ class RecursiveFileObserver(private val mPath: String,
     }
 
     private fun doRecursiveDeletion(file: File) {
+        Log.d(TAG, "Anchal: doRecursiveDeletion: $file ${file.absolutePath.hashCode()}")
         file.listFiles()?.forEach {
             if (it.isDirectory) {
                 doRecursiveDeletion(it)
@@ -94,15 +95,15 @@ class RecursiveFileObserver(private val mPath: String,
 
     private fun insertFileInfoToDB(file: File, location: String) {
         val defaultPath = Environment.getExternalStorageDirectory().path + "/"
-        Log.d(TAG, "Anchal: insertFileInfoToDB1: ")
+//        Log.d(TAG, "Anchal: insertFileInfoToDB1: ")
         val data = MyDataClass(file.name,
-            file.absolutePath.hashCode().toString(),
+            "${file.absolutePath.hashCode()}",
             file.parent?.plus("/") ?: defaultPath,
             if (file.isFile) file.extension else file.name,
             "location",
             file.length().toString())
 
-        Log.d(TAG, "Anchal: insertFileInfoToDB2: ")
+//        Log.d(TAG, "Anchal: insertFileInfoToDB2: ")
         Log.d(TAG, "Anchal: insertFileInfoToDB: $data ${file.absolutePath}")
         Instance.dbHelper.writeFileInfoToDB(data)
     }
@@ -120,7 +121,7 @@ class RecursiveFileObserver(private val mPath: String,
                 DELETE_SELF -> {
                     Log.d(TAG, "Anchal: onEvent: DELETE_SELF ${file.absoluteFile}")
                     this@RecursiveFileObserver.stopWatching(filePath)
-                    doRecursiveDeletion(file)
+//                    doRecursiveDeletion(file)
                 }
                 DELETE -> {
                     Log.d(TAG, "Anchal: onEvent: DELETE ${file.path}")
@@ -132,7 +133,7 @@ class RecursiveFileObserver(private val mPath: String,
                         this@RecursiveFileObserver.startWatching(file.absolutePath)
                     }
                     Log.d(TAG, "Anchal: onEvent: CREATE insertInfo trig")
-                    val location = locationServiceProvider.getLastLocation()
+                    val location = "LOCATION"
                     insertFileInfoToDB(file, location)
                     Log.d(TAG, "Anchal: onEvent: CREATE inserted")
                 }
