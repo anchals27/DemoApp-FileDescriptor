@@ -8,6 +8,9 @@
 
 using namespace std;
 
+const char MAP_DELI = ';';
+const char PAIR_DELI = ':';
+
 
 std::string jstring2string(JNIEnv *env, jstring jStr) {
 
@@ -29,19 +32,22 @@ std::string jstring2string(JNIEnv *env, jstring jStr) {
 
 void serializeMap(unordered_map<string, long> &mapping, string &str) {
     for (auto itr: mapping) {
-        str += (itr.first + ":" + to_string(itr.second) + " ");
+        str += (itr.first + PAIR_DELI + to_string(itr.second) + MAP_DELI);
     }
 }
 
 void getMappingFromString(string cppStr, unordered_map<string, long> &mapping) {
     stringstream ss1(cppStr);
     string pairing;
-    while (ss1 >> pairing) {
+    while (!ss1.eof()) {
+        getline(ss1, pairing, MAP_DELI);
+        if (pairing.empty())
+            return;
         stringstream ss2(pairing);
         string type, size;
         while(!ss2.eof()) {
-            getline(ss2, type, ':');
-            getline(ss2, size, ':');
+            getline(ss2, type, PAIR_DELI);
+            getline(ss2, size, PAIR_DELI);
             long sz = stol(size);
             mapping[type] += sz;
         }

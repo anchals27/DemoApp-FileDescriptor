@@ -17,13 +17,13 @@ class CppHelper : ICppHelper {
     private fun convertListToString(list: List<MyDataClass>) : String {
         var str = String()
         for (li in list) {
-            str += (li.fileType + ":" + li.fileSize + " ")
+            str += (li.fileType + ":" + li.fileSize + ";")
         }
         return str
     }
 
     private fun convertStringToMap(string: String) : Map<String, Long> {
-        val list: List<String> = string.split(" ")
+        val list: List<String> = string.split(";")
         val mapping : MutableMap<String, Long> =  mutableMapOf()
         for (li in list) {
             val pair = li.split(":")
