@@ -12,11 +12,12 @@ import androidx.lifecycle.ViewModelProviders
 import com.androidplot.pie.PieChart
 import com.androidplot.pie.Segment
 import com.androidplot.pie.SegmentFormatter
+import com.example.filedescripter.PathStackTracker
 import com.example.filedescripter.ViewModels.AnalyticsFragmentVM
 import com.example.filedescripter.R
 import com.example.filedescripter.databinding.FragmentAnalyticsBinding
 
-class AnalyticsFragment : Fragment() {
+class AnalyticsFragment(private val pathStackTracker: PathStackTracker) : Fragment() {
     private lateinit var _binding: FragmentAnalyticsBinding
     private lateinit var _viewModel: AnalyticsFragmentVM
     private val colorList = listOf(Color.RED, Color.GREEN, Color.DKGRAY, Color.BLUE, Color.MAGENTA, Color.GRAY)
@@ -35,7 +36,7 @@ class AnalyticsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "Anchal: AnalyticsFragment: onViewCreated: ")
-        val mapping = _viewModel.getTypeToSizeMapping()
+        val mapping = _viewModel.getTypeToSizeMapping(pathStackTracker.curPath)
         updatePieChart(mapping, view)
     }
 

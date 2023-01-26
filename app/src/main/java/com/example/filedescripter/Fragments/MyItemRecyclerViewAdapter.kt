@@ -7,17 +7,29 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.filedescripter.MyDataClass
 import com.example.filedescripter.databinding.ListItemBinding
+import java.io.File
+import kotlin.math.exp
 
-class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>) : RecyclerView.Adapter<BaseViewHolder>() {
-    class ListItemVH(private val myView: ListItemBinding) : BaseViewHolder(myView.root) {
+class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
+                                private val explorerFragment: ExplorerFragment) : RecyclerView.Adapter<BaseViewHolder>() {
+    class ListItemVH(private val myView: ListItemBinding,private val explorerFragment: ExplorerFragment) : BaseViewHolder(myView.root) {
         override fun bindData(position: Int, data: Any) {
-            myView.modelData = data as MyDataClass
+            val myDataClass = data as MyDataClass
+            myView.modelData = myDataClass
+            myView.root.setOnClickListener {
+                Log.d(TAG, "Anchal: bindData: $position ${myDataClass.fileName}")
+                if (File(myDataClass.filePath + myDataClass.fileName).isDirectory) {
+                    Log.d(TAG, "Anchal: bindData: moveToThisFolder")
+                    explorerFragment.pathStackTracker.moveToThisFolder(myDataClass.fileName)
+                    explorerFragment.reloadList()
+                }
+            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        val binding = ListItemBinding.inflate(LayoutInflater.from(parent.context), parent,false)
-        return ListItemVH(binding)
+        val binding = ListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ListItemVH(binding, explorerFragment)
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {

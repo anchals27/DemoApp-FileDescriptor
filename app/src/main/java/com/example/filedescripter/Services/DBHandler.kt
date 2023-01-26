@@ -119,7 +119,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
                 }
             } while(cursor.moveToNext())
         } else {
-            return ArrayList(listOf(MyDataClass("Oops! You Ran into a problem!!, Cursor is null")))
+            return ArrayList(listOf(MyDataClass("No items to display here...")))
         }
         cursor.close()
         db.close()

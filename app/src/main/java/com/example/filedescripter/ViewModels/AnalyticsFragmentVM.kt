@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import com.example.filedescripter.*
 import com.example.filedescripter.Model.ExplorerRepo
 import com.example.filedescripter.Model.IExplorerRepo
+import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.Services.CppHelper
 
 class AnalyticsFragmentVM(private val explorerRepo: IExplorerRepo) : ViewModel() {
@@ -12,7 +13,7 @@ class AnalyticsFragmentVM(private val explorerRepo: IExplorerRepo) : ViewModel()
     private var curPath = Environment.getExternalStorageDirectory().path + "/"
     private val cppHelper = CppHelper()
 
-    fun getTypeToSizeMapping(): Map<String, Long> {
+    fun getTypeToSizeMapping(curPath: String): Map<String, Long> {
         val list = explorerRepo.getFilesInfoData(curPath)
         return doAnalysis(list)
     }

@@ -10,13 +10,14 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.filedescripter.MyApplication.Companion.Instance
+import com.example.filedescripter.PathStackTracker
 import com.example.filedescripter.ViewModels.ExplorerFragmentVM
 import com.example.filedescripter.databinding.FragmentItemListBinding
 
 /**
  * A fragment representing a list of Items.
  */
-class ExplorerFragment : Fragment() {
+class ExplorerFragment(val pathStackTracker: PathStackTracker) : Fragment() {
 
     private lateinit var _binding: FragmentItemListBinding
     private lateinit var _viewModel: ExplorerFragmentVM
@@ -38,7 +39,7 @@ class ExplorerFragment : Fragment() {
         Log.d(TAG, "Anchal: onViewCreated: ")
         super.onViewCreated(view, savedInstanceState)
         _binding.recyclerView.layoutManager = LinearLayoutManager(context)
-        _adapter = MyItemRecyclerViewAdapter(ArrayList())
+        _adapter = MyItemRecyclerViewAdapter(ArrayList(), this)
         _binding.recyclerView.adapter = _adapter
         _viewModel.listLiveData.observe(viewLifecycleOwner) {
             if (it!=null) {
@@ -48,11 +49,11 @@ class ExplorerFragment : Fragment() {
                 Log.d(TAG, "Anchal: onViewCreated: list is null")
             }
         }
-        _viewModel.getDirectoryList()
+        _viewModel.getDirectoryList(pathStackTracker.curPath)
     }
 
     fun reloadList() {
-        _viewModel.getDirectoryList()
+        _viewModel.getDirectoryList(pathStackTracker.curPath)
     }
 
 }

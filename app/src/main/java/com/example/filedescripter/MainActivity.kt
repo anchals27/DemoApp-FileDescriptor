@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.util.Log
+import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -30,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
     private val STORAGE_PERMISSION_CODE = 101
     private var isDBLoaded = false
-    private var curPath = Environment.getExternalStorageDirectory().path + "/"
+    private lateinit var pathStackTracker : PathStackTracker
     private lateinit var locationServiceProvider : LocationServiceProvider
     private lateinit var locationManager: LocationManager
     private lateinit var explorerFragment : ExplorerFragment
@@ -46,14 +47,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         createLocationService()
         val addressBar = findViewById<TextView>(R.id.addressBar)
-        addressBar.text = curPath
-        explorerFragment = ExplorerFragment()
-        analyticsFragment = AnalyticsFragment()
+        pathStackTracker = PathStackTracker(addressBar)
+//        addressBar.text = pathStackTracker.curPath
+        explorerFragment = ExplorerFragment(pathStackTracker)
+        analyticsFragment = AnalyticsFragment(pathStackTracker)
         setUpFragments()
         if (SDK_INT >= Build.VERSION_CODES.Q) {
-            fileCreationObserver = RecursiveFileObserver(curPath, locationServiceProvider)
+            fileCreationObserver = RecursiveFileObserver(pathStackTracker.curPath, locationServiceProvider,
+                                                            explorerFragment)
             fileCreationObserver.startWatching()
         }
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+//        supportActionBar.
     }
 
     override fun onRequestPermissionsResult(
@@ -117,8 +122,6 @@ class MainActivity : AppCompatActivity() {
 
         Log.d(TAG, "Anchal: onStart: All Permissions are granted")
         doStartupProcesses()
-
-        explorerFragment.reloadList()
     }
 
     private fun doStartupProcesses() {
@@ -166,5 +169,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-//    extern fun getAnalyticsFromCpp(str: String) : String
+    override fun onSupportNavigateUp(): Boolean {
+        pathStackTracker.moveBack()
+        explorerFragment.reloadList()
+        Log.d(TAG, "Anchal: onSupportNavigateUp: ")
+        return super.onSupportNavigateUp()
+    }
 }

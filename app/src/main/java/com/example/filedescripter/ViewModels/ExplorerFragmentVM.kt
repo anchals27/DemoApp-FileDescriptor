@@ -9,19 +9,18 @@ import com.example.filedescripter.Model.ExplorerRepo
 import com.example.filedescripter.Model.IExplorerRepo
 import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.MyDataClass
+import com.example.filedescripter.PathStackTracker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ExplorerFragmentVM(private val explorerRepo: IExplorerRepo): ViewModel() {
 
-    private var curPath = Environment.getExternalStorageDirectory().path + "/"
-    private val _listLiveData = MutableLiveData<List<MyDataClass>>(explorerRepo.getFilesInfoData(curPath))
-//    private val imageButton =
+    private val _listLiveData = MutableLiveData<List<MyDataClass>>()
 
     val listLiveData: LiveData<List<MyDataClass>>
         get() = _listLiveData
 
-    fun getDirectoryList() {
+    fun getDirectoryList(curPath: String) {
         val list = explorerRepo.getFilesInfoData(curPath)
         Log.d(TAG, "Anchal: getDirectoryList: $list")
         viewModelScope.launch(Dispatchers.IO) {
