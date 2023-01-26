@@ -2,7 +2,11 @@ package com.example.filedescripter
 
 // import android.Manifest
 import RecursiveFileObserver
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
@@ -24,8 +28,9 @@ import com.example.filedescripter.Fragments.AnalyticsFragment
 import com.example.filedescripter.Fragments.ExplorerFragment
 import com.example.filedescripter.Services.DirectoryParser
 import com.example.filedescripter.Services.LocationServiceProvider
+import com.example.filedescripter.Services.NotificationService
+import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
@@ -38,7 +43,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var explorerFragment : ExplorerFragment
     private lateinit var analyticsFragment : AnalyticsFragment
     private lateinit var fileCreationObserver: RecursiveFileObserver
+    private lateinit var notificationService: NotificationService
     private var curFragment: Fragment? = null
+    private val CHANNEL_ID = "1"
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,10 +58,11 @@ class MainActivity : AppCompatActivity() {
         pathStackTracker = PathStackTracker(addressBar)
         explorerFragment = ExplorerFragment(pathStackTracker)
         analyticsFragment = AnalyticsFragment(pathStackTracker)
+        notificationService = NotificationService(getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
         setUpFragments()
         if (SDK_INT >= Build.VERSION_CODES.Q) {
             fileCreationObserver = RecursiveFileObserver(pathStackTracker.curPath, locationServiceProvider,
-                                                            explorerFragment)
+                                                            explorerFragment, notificationService)
             fileCreationObserver.startWatching()
         }
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
@@ -105,7 +113,7 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         Log.d(TAG, "Anchal: onStart")
 
-        if (!locationServiceProvider!!.isLocationPermissionGranted()) {
+        if (!locationServiceProvider.isLocationPermissionGranted()) {
             requestPermissionForLocation()
             return
         }
@@ -115,13 +123,14 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        if (!locationServiceProvider!!.isLocationEnabled()) {
-            locationServiceProvider!!.startIntentToEnableLocation()
+        if (!locationServiceProvider.isLocationEnabled()) {
+            locationServiceProvider.startIntentToEnableLocation()
             return
         }
 
         Log.d(TAG, "Anchal: onStart: All Permissions are granted")
         doStartupProcesses()
+        explorerFragment.reloadList()
     }
 
     private fun doStartupProcesses() {
@@ -162,7 +171,7 @@ class MainActivity : AppCompatActivity() {
         if (!isDBLoaded) {
             isDBLoaded = true
             Log.d(TAG, "Anchal: doLoadingOfDB: Loading")
-            DirectoryParser.doParsingOfInternalStorage(locationServiceProvider!!)
+            DirectoryParser.doParsingOfInternalStorage(locationServiceProvider)
         } else {
             Log.d(TAG, "Anchal: doLoadingOfDB: Loading avoided")
             Toast.makeText(this, "Database already loaded", Toast.LENGTH_SHORT).show()
@@ -184,6 +193,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goBackToParent() {
+        if (curFragment == analyticsFragment) {
+            Log.d(TAG, "Anchal: goBackToParent: committing to analytics fragment")
+            val menuItem = findViewById<BottomNavigationItemView>(R.id.Explorer)
+            menuItem.performClick()
+            return
+        }
         pathStackTracker.moveBack()
         explorerFragment.reloadList()
         Log.d(TAG, "Anchal: onSupportNavigateUp: ")

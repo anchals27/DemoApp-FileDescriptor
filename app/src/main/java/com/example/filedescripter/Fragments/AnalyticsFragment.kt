@@ -47,11 +47,11 @@ class AnalyticsFragment(private val pathStackTracker: PathStackTracker) : Fragme
         for ((key, value) in mapping) {
             totalSize += value
         }
+        val pieChart = view.findViewById<PieChart>(R.id.pieChart)
         for ((key, value) in mapping) {
             Log.d(TAG, "Anchal: updatePieChart: $key, $value")
             val segmentPair = Segment(key + " ${value * 100 / totalSize}%", value)
             val segmentColor = SegmentFormatter(colorList[i])
-            val pieChart = view.findViewById<PieChart>(R.id.pieChart)
             pieChart.addSegment(segmentPair, segmentColor)
             i++
             i %= colorList.size

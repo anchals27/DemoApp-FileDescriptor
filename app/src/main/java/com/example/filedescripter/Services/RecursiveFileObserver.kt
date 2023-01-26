@@ -4,11 +4,15 @@ import android.os.Environment
 import android.os.FileObserver
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import com.example.filedescripter.Fragments.AnalyticsFragment
 import com.example.filedescripter.Fragments.ExplorerFragment
 import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.MyDataClass
 import com.example.filedescripter.Services.DirectoryParser
 import com.example.filedescripter.Services.LocationServiceProvider
+import com.example.filedescripter.Services.NotificationService
 import com.example.filedescripter.ViewModels.ExplorerFragmentVM
 import java.io.File
 import java.util.*
@@ -22,6 +26,7 @@ import java.util.*
 class RecursiveFileObserver(private val mPath: String,
                             private val locationServiceProvider: LocationServiceProvider,
                             private val explorerFragment: ExplorerFragment,
+                            private val notificationService: NotificationService,
                             private val mask: Int = ALL_EVENTS) :
     FileObserver(File(mPath), mask) {
     private val mObservers: MutableMap<String, FileObserver?> = HashMap()
@@ -130,6 +135,7 @@ class RecursiveFileObserver(private val mPath: String,
                     Log.d(TAG, "Anchal: onEvent: DELETE ${file.path}")
                     doRecursiveDeletion(file)
                     explorerFragment.reloadList()
+                    triggerFileDeletionNotification(file)
                 }
                 CREATE -> {
                     Log.d(TAG, "Anchal: onEvent: CREATE ${file.absoluteFile}")
@@ -141,6 +147,7 @@ class RecursiveFileObserver(private val mPath: String,
                     insertFileInfoToDB(file, location)
                     Log.d(TAG, "Anchal: onEvent: CREATE inserted")
                     explorerFragment.reloadList()
+                    triggerFileCreationNotification(file)
                 }
                 MODIFY -> {
                     Log.d(TAG, "Anchal: onEvent: MODIFY ${file.absoluteFile}")
@@ -150,4 +157,17 @@ class RecursiveFileObserver(private val mPath: String,
             }
         }
     }
+
+    fun triggerFileCreationNotification(file: File) {
+        with(NotificationManagerCompat.from(Instance.applicationContext)) {
+            notify(1, notificationService.getFileCreationNotificationBuilder(file).build())
+        }
+    }
+
+    fun triggerFileDeletionNotification(file: File) {
+        with(NotificationManagerCompat.from(Instance.applicationContext)) {
+            notify(1, notificationService.getFileDeletionNotificationBuilder(file).build())
+        }
+    }
+
 }
