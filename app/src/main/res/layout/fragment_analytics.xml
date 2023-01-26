@@ -8,7 +8,7 @@
     <com.androidplot.pie.PieChart
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        style="@style/APDefacto.Dark"
+        style="@style/APDefacto.Light"
         android:id="@+id/pieChart"
        />
 

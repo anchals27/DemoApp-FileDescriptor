@@ -28,12 +28,14 @@ class PathStackTracker(private val addressBar: TextView) {
     }
 
     fun moveBack() {
-        stack.removeLast()
-        curPath = String()
-        for (folderName in stack) {
-            curPath += ("$folderName/")
+        if (curPath != "$DEFAULT_PATH/") {
+            stack.removeLast()
+            curPath = String()
+            for (folderName in stack) {
+                curPath += ("$folderName/")
+            }
+            addressBar.text = curPath
         }
-        addressBar.text = curPath
     }
 
 }

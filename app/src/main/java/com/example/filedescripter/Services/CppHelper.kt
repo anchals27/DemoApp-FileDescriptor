@@ -33,6 +33,9 @@ class CppHelper : ICppHelper {
     }
 
     override fun doAnalysisWithJNI(list: List<MyDataClass>) : Map<String, Long> {
+        if (list.isEmpty() || (list.size == 1 && list[0].fileId == "")) {
+            return mapOf()
+        }
         val queryString = convertListToString(list)
         Log.d(TAG, "Anchal: queryString: $queryString")
         val resultString = getAnalysisFromCpp(queryString)

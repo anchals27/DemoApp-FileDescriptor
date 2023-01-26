@@ -8,6 +8,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import com.example.filedescripter.Services.DirectoryParser
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -128,6 +129,16 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
 
     fun updateFileSizeInDB(file: File) {
         Log.d(TAG, "Anchal: updateFileSizeInDB: $file")
+        if (!checkFileExistInDB(file.absolutePath)) {
+            val data = MyDataClass(file.name,
+                file.absolutePath.hashCode().toString(),
+                file.parent + "/",
+                if (file.isFile) file.extension else file.name,
+                "",
+                file.length().toString())
+            writeFileInfoToDB(data)
+        }
+
         val db = this.writableDatabase
         val query = "UPDATE $TABLE_NAME " +
                 "SET $FILE_SIZE = ${file.length()} " +
@@ -135,6 +146,14 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         Log.d(TAG, "Anchal: Update Query: $query")
         db.execSQL(query)
         db.close()
+    }
+
+    private fun checkFileExistInDB(absolutePath: String): Boolean {
+        val db = this.readableDatabase
+        val query = "SELECT $FILE_ID FROM $TABLE_NAME WHERE $FILE_ID = ${absolutePath.hashCode()}"
+        Log.d(TAG, "Anchal: InsertInfo: checkFileExistInDB: $query")
+        val cursor = db.rawQuery(query, null)
+        return cursor.moveToFirst()
     }
 
     fun deleteFileFromDB(file: File) {

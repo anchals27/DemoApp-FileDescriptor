@@ -10,7 +10,7 @@ import com.example.filedescripter.Services.CppHelper
 
 class AnalyticsFragmentVM(private val explorerRepo: IExplorerRepo) : ViewModel() {
 
-    private var curPath = Environment.getExternalStorageDirectory().path + "/"
+//    private var curPath = Environment.getExternalStorageDirectory().path + "/"
     private val cppHelper = CppHelper()
 
     fun getTypeToSizeMapping(curPath: String): Map<String, Long> {

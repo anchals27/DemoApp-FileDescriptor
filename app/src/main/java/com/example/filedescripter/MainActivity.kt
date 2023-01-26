@@ -16,6 +16,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -48,7 +49,6 @@ class MainActivity : AppCompatActivity() {
         createLocationService()
         val addressBar = findViewById<TextView>(R.id.addressBar)
         pathStackTracker = PathStackTracker(addressBar)
-//        addressBar.text = pathStackTracker.curPath
         explorerFragment = ExplorerFragment(pathStackTracker)
         analyticsFragment = AnalyticsFragment(pathStackTracker)
         setUpFragments()
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             fileCreationObserver.startWatching()
         }
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-//        supportActionBar.
+        setCallbackForBackButton()
     }
 
     override fun onRequestPermissionsResult(
@@ -169,10 +169,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setCallbackForBackButton() {
+        val callback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                goBackToParent()
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, callback)
+    }
+
     override fun onSupportNavigateUp(): Boolean {
+        goBackToParent()
+        return super.onSupportNavigateUp()
+    }
+
+    fun goBackToParent() {
         pathStackTracker.moveBack()
         explorerFragment.reloadList()
         Log.d(TAG, "Anchal: onSupportNavigateUp: ")
-        return super.onSupportNavigateUp()
     }
+
 }

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.filedescripter.MyDataClass
+import com.example.filedescripter.R
 import com.example.filedescripter.databinding.ListItemBinding
 import java.io.File
 import kotlin.math.exp
@@ -15,15 +16,20 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
     class ListItemVH(private val myView: ListItemBinding,private val explorerFragment: ExplorerFragment) : BaseViewHolder(myView.root) {
         override fun bindData(position: Int, data: Any) {
             val myDataClass = data as MyDataClass
+            val isDirectory = File(myDataClass.filePath + myDataClass.fileName).isDirectory
+            val isFile = File(myDataClass.filePath + myDataClass.fileName).isFile
             myView.modelData = myDataClass
             myView.root.setOnClickListener {
                 Log.d(TAG, "Anchal: bindData: $position ${myDataClass.fileName}")
-                if (File(myDataClass.filePath + myDataClass.fileName).isDirectory) {
+                if (isDirectory) {
                     Log.d(TAG, "Anchal: bindData: moveToThisFolder")
                     explorerFragment.pathStackTracker.moveToThisFolder(myDataClass.fileName)
                     explorerFragment.reloadList()
                 }
             }
+            myView.myImage.setImageResource(if (isDirectory) R.drawable.folder_icon
+                                            else if (isFile) R.drawable.icons8_file_64
+                                            else R.drawable.icons8_question_mark_48)
         }
     }
 

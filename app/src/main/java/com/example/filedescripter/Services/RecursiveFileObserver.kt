@@ -137,7 +137,7 @@ class RecursiveFileObserver(private val mPath: String,
                         this@RecursiveFileObserver.startWatching(file.absolutePath)
                     }
                     Log.d(TAG, "Anchal: onEvent: CREATE insertInfo trig")
-                    val location = "LOCATION"
+                    val location = ""
                     insertFileInfoToDB(file, location)
                     Log.d(TAG, "Anchal: onEvent: CREATE inserted")
                     explorerFragment.reloadList()
