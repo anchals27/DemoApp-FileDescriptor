@@ -19,6 +19,11 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
             val isDirectory = File(myDataClass.filePath + myDataClass.fileName).isDirectory
             val isFile = File(myDataClass.filePath + myDataClass.fileName).isFile
             myView.modelData = myDataClass
+            setOnClickForRoot(myDataClass, isDirectory)
+            setViewParameters(myDataClass, isDirectory, isFile)
+        }
+
+        private fun setOnClickForRoot(myDataClass: MyDataClass, isDirectory: Boolean) {
             myView.root.setOnClickListener {
                 Log.d(TAG, "Anchal: bindData: $position ${myDataClass.fileName}")
                 if (isDirectory) {
@@ -27,9 +32,31 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
                     explorerFragment.reloadList()
                 }
             }
+        }
+
+        private fun setViewParameters(myDataClass: MyDataClass, isDirectory: Boolean, isFile: Boolean) {
             myView.myImage.setImageResource(if (isDirectory) R.drawable.folder_icon
-                                            else if (isFile) R.drawable.icons8_file_64
-                                            else R.drawable.icons8_question_mark_48)
+            else if (isFile) R.drawable.icons8_file_64
+            else R.drawable.icons8_question_mark_48)
+            myView.typeTextView.text =  if (isDirectory) "Folder"
+                                        else if (isFile) myDataClass.fileType
+                                        else ""
+            if (isDirectory || isFile) {
+                val fileSize = myDataClass.fileSize.toLong()
+                var displaySize : Long = 0
+                var unitType = ""
+                if (fileSize < 1024) {
+                    displaySize = fileSize
+                    unitType = "B"
+                } else if (fileSize < 1024 * 1024) {
+                    displaySize = fileSize / 1024
+                    unitType = "KB"
+                } else {
+                    displaySize = fileSize / (1024 * 1024)
+                    unitType = "MB"
+                }
+                myView.sizeTextView.text = displaySize.toString() + unitType
+            }
         }
     }
 

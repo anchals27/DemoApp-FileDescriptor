@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.lifecycle.ViewModelProviders
 import com.androidplot.pie.PieChart
 import com.androidplot.pie.Segment
@@ -44,13 +45,18 @@ class AnalyticsFragment(private val pathStackTracker: PathStackTracker) : Fragme
         var i = 0
         Log.d(TAG, "Anchal: updatePieChart: $mapping")
         var totalSize : Long = 0
+        if (mapping.isEmpty()) {
+            val textView = view.findViewById<TextView>(R.id.textView)
+            textView.text = "Empty Folder !!"
+            return
+        }
         for ((key, value) in mapping) {
             totalSize += value
         }
         val pieChart = view.findViewById<PieChart>(R.id.pieChart)
         for ((key, value) in mapping) {
             Log.d(TAG, "Anchal: updatePieChart: $key, $value")
-            val segmentPair = Segment(key + " ${value * 100 / totalSize}%", value)
+            val segmentPair = Segment(key + " ${value * 100 / (totalSize + 1)}%", value)
             val segmentColor = SegmentFormatter(colorList[i])
             pieChart.addSegment(segmentPair, segmentColor)
             i++
