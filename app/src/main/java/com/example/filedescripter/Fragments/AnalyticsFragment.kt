@@ -53,10 +53,20 @@ class AnalyticsFragment(private val pathStackTracker: PathStackTracker) : Fragme
         for ((key, value) in mapping) {
             totalSize += value
         }
+        if (totalSize == (0).toLong()) {
+            val textView = view.findViewById<TextView>(R.id.textView)
+            textView.text = "No memory used !!"
+            return
+        }
         val pieChart = view.findViewById<PieChart>(R.id.pieChart)
         for ((key, value) in mapping) {
-            Log.d(TAG, "Anchal: updatePieChart: $key, $value")
-            val segmentPair = Segment(key + " ${value * 100 / (totalSize + 1)}%", value)
+            val percentage = if (totalSize == (0).toLong()) 100 else value * 100 / (totalSize)
+            var segmentPair = Segment("$key $percentage%", value)
+            Log.d(TAG, "Anchal: updatePieChart: $key, $value $percentage%")
+            if (percentage < 1) {
+                Log.d(TAG, "Anchal: updatePieChart: less than 1")
+                segmentPair = Segment("", value)
+            }
             val segmentColor = SegmentFormatter(colorList[i])
             pieChart.addSegment(segmentPair, segmentColor)
             i++
