@@ -5,10 +5,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.filedescripter.Model.MyDataClass
+import com.example.filedescripter.MyDataClass
 import com.example.filedescripter.R
 import com.example.filedescripter.databinding.ListItemBinding
 import java.io.File
+import kotlin.math.exp
 
 class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
                                 private val explorerFragment: ExplorerFragment) : RecyclerView.Adapter<BaseViewHolder>() {
@@ -42,7 +43,7 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
                                         else ""
             if (isDirectory || isFile || myDataClass.fileId != "") {
                 val fileSize = myDataClass.fileSize.toLong()
-                var displaySize: Long
+                var displaySize : Long = 0
                 var unitType = ""
                 if (fileSize < 1024) {
                     displaySize = fileSize

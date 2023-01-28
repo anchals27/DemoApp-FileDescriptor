@@ -8,7 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
 import com.example.filedescripter.Fragments.ExplorerFragment
 import com.example.filedescripter.MyApplication.Companion.Instance
-import com.example.filedescripter.Model.MyDataClass
+import com.example.filedescripter.MyDataClass
 import com.example.filedescripter.Services.LocationServiceProvider
 import com.example.filedescripter.Services.NotificationService
 import java.io.File

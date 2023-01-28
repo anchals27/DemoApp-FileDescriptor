@@ -1,6 +1,7 @@
 package com.example.filedescripter.Model
 
 import com.example.filedescripter.DBHelper
+import com.example.filedescripter.MyDataClass
 
 class ExplorerRepo(private val dbHelper: DBHelper) : IExplorerRepo {
 
