@@ -33,7 +33,7 @@ class DirectoryParser {
                 if (it.isFile) it.extension else it.name,
                 location,
                 size.toString())
-            Log.d(TAG, "Anchal: insertFileInfoToDB: $data ${it.absolutePath}")
+            Log.d(TAG, "Anchal: insertFileInfoToDB: $data ${it.absolutePath} ${it.length()}")
             Instance.dbHelper.writeFileInfoToDB(data)
         }
 

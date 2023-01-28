@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.filedescripter.Fragments.AnalyticsFragment
 import com.example.filedescripter.Fragments.ExplorerFragment
+import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.Services.DirectoryParser
 import com.example.filedescripter.Services.LocationServiceProvider
 import com.example.filedescripter.Services.NotificationService
@@ -65,7 +66,6 @@ class MainActivity : AppCompatActivity() {
                                                             explorerFragment, notificationService)
             fileCreationObserver.startWatching()
         }
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         setCallbackForBackButton()
     }
 
@@ -182,22 +182,13 @@ class MainActivity : AppCompatActivity() {
     private fun setCallbackForBackButton() {
         val callback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (pathStackTracker.curPath != pathStackTracker.STARTING_PATH)
+                if (pathStackTracker.curPath != Instance.STARTING_PATH)
                     goBackToParent()
                 else
                     finish()
             }
         }
         onBackPressedDispatcher.addCallback(this, callback)
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        if (pathStackTracker.curPath != pathStackTracker.STARTING_PATH)
-            goBackToParent()
-        else {
-            Toast.makeText(this, "You are at the starting of storage", Toast.LENGTH_SHORT).show()
-        }
-        return super.onSupportNavigateUp()
     }
 
     fun goBackToParent() {

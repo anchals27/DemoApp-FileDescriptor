@@ -10,12 +10,10 @@ import java.util.*
 
 class PathStackTracker(private val addressBar: TextView) {
     private val stack = mutableListOf<String>()
-    private val DEFAULT_PATH = Environment.getExternalStorageDirectory().path
-    val STARTING_PATH = "$DEFAULT_PATH/"
-    var curPath = STARTING_PATH
+    var curPath = Instance.STARTING_PATH
 
     init {
-        val pathArr = DEFAULT_PATH.split("/")
+        val pathArr = Instance.DEFAULT_PATH.split("/")
         for (folderName in pathArr) {
             stack.add(folderName)
         }
@@ -29,7 +27,7 @@ class PathStackTracker(private val addressBar: TextView) {
     }
 
     fun moveBack() {
-        if (curPath != "$DEFAULT_PATH/") {
+        if (curPath != Instance.STARTING_PATH) {
             stack.removeLast()
             curPath = String()
             for (folderName in stack) {

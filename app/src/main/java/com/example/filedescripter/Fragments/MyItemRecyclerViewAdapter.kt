@@ -41,7 +41,7 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
             myView.typeTextView.text =  if (isDirectory) "Folder"
                                         else if (isFile) myDataClass.fileType
                                         else ""
-            if (isDirectory || isFile) {
+            if (isDirectory || isFile || myDataClass.fileId != "") {
                 val fileSize = myDataClass.fileSize.toLong()
                 var displaySize : Long = 0
                 var unitType = ""

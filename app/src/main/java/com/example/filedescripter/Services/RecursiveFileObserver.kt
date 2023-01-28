@@ -5,16 +5,12 @@ import android.os.FileObserver
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.example.filedescripter.Fragments.AnalyticsFragment
 import com.example.filedescripter.Fragments.ExplorerFragment
 import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.MyDataClass
-import com.example.filedescripter.Services.DirectoryParser
 import com.example.filedescripter.Services.LocationServiceProvider
 import com.example.filedescripter.Services.NotificationService
-import com.example.filedescripter.ViewModels.ExplorerFragmentVM
 import java.io.File
 import java.util.*
 
@@ -98,8 +94,40 @@ class RecursiveFileObserver(private val mPath: String,
         Instance.dbHelper.deleteFileFromDB(file)
     }
 
+    private fun doRecursiveDeletionsAndUpdates(file: File) {
+        val prevSize = getPrevSizeOfFile(file)
+        doRecursiveDeletion(file)
+        if (prevSize != null) {
+            doCascadingUpdates(File(file.parent), -prevSize)
+        }
+    }
+
     private fun doUpdateInDBForFile(file: File) {
+        val prevSize = getPrevSizeOfFile(file)
         Instance.dbHelper.updateFileSizeInDB(file)
+        if (prevSize != null) {
+            val newSize = file.length()
+            val deltaSize = newSize - prevSize
+            val parentFile = File(file.parent)
+            doCascadingUpdates(parentFile, deltaSize)
+        }
+    }
+
+    private fun getPrevSizeOfFile(file: File): Long? {
+        val data = Instance.dbHelper.getFileInfo(file.absolutePath.hashCode().toString())
+        return data?.fileSize?.toLong()
+    }
+
+    private fun doCascadingUpdates(parentFile: File, deltaSize: Long) {
+        var file = parentFile
+        while(file.path != Instance.DEFAULT_PATH) {
+            val fileId = file.absolutePath.hashCode().toString()
+            val prevSize = getPrevSizeOfFile(file) ?: break
+            val newSize = prevSize + deltaSize
+            Log.d(TAG, "Anchal: doCascadingUpdates: ${file.path} $deltaSize $newSize")
+            Instance.dbHelper.updateOnlyFileSizeInDB(fileId, newSize.toString())
+            file = File(file.parent)
+        }
     }
 
     private fun insertFileInfoToDB(file: File, location: String) {
@@ -110,11 +138,13 @@ class RecursiveFileObserver(private val mPath: String,
             file.parent?.plus("/") ?: defaultPath,
             if (file.isFile) file.extension else file.name,
             location,
-            file.length().toString())
+            if (file.isDirectory) "0" else file.length().toString())
 
 //        Log.d(TAG, "Anchal: insertFileInfoToDB2: ")
         Log.d(TAG, "Anchal: insertFileInfoToDB: $data ${file.absolutePath}")
         Instance.dbHelper.writeFileInfoToDB(data)
+        if (file.isFile)
+            doCascadingUpdates(File(file.parent), file.length())
     }
 
     private inner class SingleFileObserver(private val filePath: String, mask: Int) :
@@ -134,7 +164,7 @@ class RecursiveFileObserver(private val mPath: String,
                 }
                 DELETE -> {
                     Log.d(TAG, "Anchal: onEvent: DELETE ${file.path}")
-                    doRecursiveDeletion(file)
+                    doRecursiveDeletionsAndUpdates(file)
                     explorerFragment.reloadList()
                     triggerFileDeletionNotification(file)
                 }

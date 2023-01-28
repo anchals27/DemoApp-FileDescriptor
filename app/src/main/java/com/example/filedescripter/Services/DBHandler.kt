@@ -127,9 +127,43 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         return list
     }
 
-    fun updateFileSizeInDB(file: File) {
+    @SuppressLint("Range")
+    fun getFileInfo(fileId: String) : MyDataClass? {
+        val db = this.readableDatabase
+        val query = "SELECT * FROM $TABLE_NAME WHERE $FILE_ID = $fileId"
+        val cursor = db.rawQuery(query, null)
+        if (cursor.moveToFirst()) {
+            val myDataClass = MyDataClass(
+                fileName = cursor.getString(cursor.getColumnIndex(FILE_NAME)),
+                fileId = cursor.getString(cursor.getColumnIndex(FILE_ID)),
+                filePath = cursor.getString(cursor.getColumnIndex(FILE_PATH)),
+                fileSize = cursor.getString(cursor.getColumnIndex(FILE_SIZE)),
+                fileType = cursor.getString(cursor.getColumnIndex(FILE_TYPE)),
+                fileLocation = cursor.getString(cursor.getColumnIndex(FILE_LOCATION)),
+            )
+            cursor.close()
+            db.close()
+            return myDataClass
+        } else {
+            cursor.close()
+            db.close()
+            return null
+        }
+    }
+
+    fun updateOnlyFileSizeInDB(fileId: String, fileSize: String) {
+        val db = this.writableDatabase
+        val query = "UPDATE $TABLE_NAME " +
+                "SET $FILE_SIZE = $fileSize " +
+                "WHERE $FILE_ID = '$fileId'"
+        Log.d(TAG, "Anchal: Update Query: $query")
+        db.execSQL(query)
+        db.close()
+    }
+
+    fun  updateFileSizeInDB(file: File) {
         Log.d(TAG, "Anchal: updateFileSizeInDB: $file")
-        if (!checkFileExistInDB(file.absolutePath)) {
+        if (!checkFileExistInDB(file.absolutePath.hashCode().toString())) {
             val data = MyDataClass(file.name,
                 file.absolutePath.hashCode().toString(),
                 file.parent + "/",
@@ -137,20 +171,15 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
                 "",
                 file.length().toString())
             writeFileInfoToDB(data)
+            return
         }
-
-        val db = this.writableDatabase
-        val query = "UPDATE $TABLE_NAME " +
-                "SET $FILE_SIZE = ${file.length()} " +
-                "WHERE $FILE_ID = '${file.absolutePath.hashCode()}'"
-        Log.d(TAG, "Anchal: Update Query: $query")
-        db.execSQL(query)
-        db.close()
+        Log.d(TAG, "Anchal: updateFileSizeInDB: ")
+        updateOnlyFileSizeInDB(file.absolutePath.hashCode().toString(), file.length().toString())
     }
 
-    private fun checkFileExistInDB(absolutePath: String): Boolean {
+    private fun checkFileExistInDB(fileId: String): Boolean {
         val db = this.readableDatabase
-        val query = "SELECT $FILE_ID FROM $TABLE_NAME WHERE $FILE_ID = ${absolutePath.hashCode()}"
+        val query = "SELECT $FILE_ID FROM $TABLE_NAME WHERE $FILE_ID = $fileId"
         Log.d(TAG, "Anchal: InsertInfo: checkFileExistInDB: $query")
         val cursor = db.rawQuery(query, null)
         return cursor.moveToFirst()
