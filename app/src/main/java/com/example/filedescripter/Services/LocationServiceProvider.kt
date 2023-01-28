@@ -19,44 +19,58 @@ class LocationServiceProvider(
     private val context: Context, private val locationManager: LocationManager
 ) {
     private val LOCATION_NOT_AVAILABLE = ""
+    private var currentLocation : Location? = null
+
+    fun getLastLocation() : String {
+        if (currentLocation == null)
+            return ""
+        val latitude : Int = (currentLocation!!.latitude).toInt()
+        val longitude : Int = (currentLocation!!.longitude).toInt()
+
+        val myLocation = "$latitude, $longitude"
+        Log.d(TAG, "Anchal: getLastLocation: $myLocation")
+
+        return myLocation
+    }
+
 
     @SuppressLint("MissingPermission")
-    fun getLastLocation(): String {
-        var currentLocation: Location? = null
-        val myLocation: String
+    fun startTrackingLocation() {
+///        var currentLocation: Location? = null
+//        val myLocation: String
 
         if (!isLocationPermissionGranted() || !isLocationEnabled()) {
-            return LOCATION_NOT_AVAILABLE
+            return
         }
 
         val hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        Log.d(TAG, "Anchal: getLastLocation: $hasGps")
+        Log.d(TAG, "Anchal: startTrackingLocation: $hasGps")
         if (hasGps) {
             locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
-                5000L,
+                500L,
                 0f
-            ) { location: Location -> currentLocation = location }
+            ) { location: Location ->
+                currentLocation = location
+//                Log.d(TAG, "Anchal: getLastLocation: Hitting here")
+            }
         }
 
-        val lastKnownLocationByGps =
-            locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-        Log.d(TAG, "Anchal: getLastLocation: $lastKnownLocationByGps")
-        lastKnownLocationByGps?.let {
-            currentLocation = lastKnownLocationByGps
+        Log.d(TAG, "Anchal: startTrackingLocation: $currentLocation")
+        if (currentLocation == null) {
+            val lastKnownLocationByGps =
+                locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            Log.d(TAG, "Anchal: getLastLocation: $lastKnownLocationByGps")
+            lastKnownLocationByGps?.let {
+                currentLocation = lastKnownLocationByGps
+            }
         }
 
         if (currentLocation == null) {
             Log.d(TAG, "Anchal: getLastLocation: null")
-            return LOCATION_NOT_AVAILABLE
+            return
         }
-        val latitude : Int = (currentLocation!!.latitude).toInt()
-        val longitude : Int = (currentLocation!!.longitude).toInt()
 
-        myLocation = "$latitude, $longitude"
-        Log.d(TAG, "Anchal: getLastLocation: $myLocation")
-
-        return myLocation
     }
 
     fun isLocationPermissionGranted() : Boolean {

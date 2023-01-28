@@ -3,6 +3,7 @@ import android.os.Build
 import android.os.Environment
 import android.os.FileObserver
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -108,7 +109,7 @@ class RecursiveFileObserver(private val mPath: String,
             "${file.absolutePath.hashCode()}",
             file.parent?.plus("/") ?: defaultPath,
             if (file.isFile) file.extension else file.name,
-            "location",
+            location,
             file.length().toString())
 
 //        Log.d(TAG, "Anchal: insertFileInfoToDB2: ")
@@ -138,12 +139,17 @@ class RecursiveFileObserver(private val mPath: String,
                     triggerFileDeletionNotification(file)
                 }
                 CREATE -> {
+                    if (file.name.contains(';') || file.name.contains(':')) {
+                        Log.d(TAG, "Anchal: onEvent: Incorrect filename detected.")
+                        Toast.makeText(Instance.applicationContext, "File name with ';' or ':' not supported", Toast.LENGTH_SHORT).show()
+                        return
+                    }
                     Log.d(TAG, "Anchal: onEvent: CREATE ${file.absoluteFile}")
                     if (watch(file)) {
                         this@RecursiveFileObserver.startWatching(file.absolutePath)
                     }
                     Log.d(TAG, "Anchal: onEvent: CREATE insertInfo trig")
-                    val location = ""
+                    val location = locationServiceProvider.getLastLocation()
                     insertFileInfoToDB(file, location)
                     Log.d(TAG, "Anchal: onEvent: CREATE inserted")
                     explorerFragment.reloadList()

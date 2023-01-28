@@ -134,6 +134,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun doStartupProcesses() {
+        locationServiceProvider.startTrackingLocation()
         doLoadingOfDB()
     }
 
@@ -181,14 +182,21 @@ class MainActivity : AppCompatActivity() {
     private fun setCallbackForBackButton() {
         val callback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                goBackToParent()
+                if (pathStackTracker.curPath != pathStackTracker.STARTING_PATH)
+                    goBackToParent()
+                else
+                    finish()
             }
         }
         onBackPressedDispatcher.addCallback(this, callback)
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        goBackToParent()
+        if (pathStackTracker.curPath != pathStackTracker.STARTING_PATH)
+            goBackToParent()
+        else {
+            Toast.makeText(this, "You are at the starting of storage", Toast.LENGTH_SHORT).show()
+        }
         return super.onSupportNavigateUp()
     }
 

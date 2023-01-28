@@ -1,6 +1,7 @@
 package com.example.filedescripter
 
 import android.app.Application
+import com.example.filedescripter.Services.LocationServiceProvider
 
 private lateinit var _myApplication: MyApplication
 

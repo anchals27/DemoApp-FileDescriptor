@@ -11,7 +11,8 @@ import java.util.*
 class PathStackTracker(private val addressBar: TextView) {
     private val stack = mutableListOf<String>()
     private val DEFAULT_PATH = Environment.getExternalStorageDirectory().path
-    var curPath = "$DEFAULT_PATH/"
+    val STARTING_PATH = "$DEFAULT_PATH/"
+    var curPath = STARTING_PATH
 
     init {
         val pathArr = DEFAULT_PATH.split("/")
