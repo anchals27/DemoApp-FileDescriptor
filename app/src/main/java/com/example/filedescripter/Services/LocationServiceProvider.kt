@@ -18,7 +18,6 @@ import com.google.android.gms.location.*
 class LocationServiceProvider(
     private val context: Context, private val locationManager: LocationManager
 ) {
-    private val LOCATION_NOT_AVAILABLE = ""
     private var currentLocation : Location? = null
 
     fun getLastLocation() : String {
@@ -36,9 +35,6 @@ class LocationServiceProvider(
 
     @SuppressLint("MissingPermission")
     fun startTrackingLocation() {
-///        var currentLocation: Location? = null
-//        val myLocation: String
-
         if (!isLocationPermissionGranted() || !isLocationEnabled()) {
             return
         }
@@ -52,7 +48,6 @@ class LocationServiceProvider(
                 0f
             ) { location: Location ->
                 currentLocation = location
-//                Log.d(TAG, "Anchal: getLastLocation: Hitting here")
             }
         }
 

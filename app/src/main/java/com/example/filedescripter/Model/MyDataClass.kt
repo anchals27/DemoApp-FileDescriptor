@@ -1,4 +1,4 @@
-package com.example.filedescripter
+package com.example.filedescripter.Model
 
 data class MyDataClass(var fileName: String,
                        var fileId: String = "",

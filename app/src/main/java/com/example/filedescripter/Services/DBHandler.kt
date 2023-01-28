@@ -8,7 +8,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-import com.example.filedescripter.Services.DirectoryParser
+import com.example.filedescripter.Model.MyDataClass
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -182,7 +182,9 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         val query = "SELECT $FILE_ID FROM $TABLE_NAME WHERE $FILE_ID = $fileId"
         Log.d(TAG, "Anchal: InsertInfo: checkFileExistInDB: $query")
         val cursor = db.rawQuery(query, null)
-        return cursor.moveToFirst()
+        val ret = cursor.moveToFirst()
+        cursor.close()
+        return ret
     }
 
     fun deleteFileFromDB(file: File) {
@@ -197,14 +199,14 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
 
     companion object{
         // here we have defined variables for our database
-        private val DATABASE_NAME = "FILE_DESCRIPTOR_DB"
-        private val DATABASE_VERSION = 1
-        val TABLE_NAME = "files_table"
-        val FILE_NAME = "file_name"
-        val FILE_ID = "file_id"
-        val FILE_PATH = "file_path"
-        val FILE_TYPE = "file_type"
-        val FILE_LOCATION = "file_location"
-        val FILE_SIZE = "file_size"
+        private const val DATABASE_NAME = "FILE_DESCRIPTOR_DB"
+        private const val DATABASE_VERSION = 1
+        private const val TABLE_NAME = "files_table"
+        private const val FILE_NAME = "file_name"
+        private const val FILE_ID = "file_id"
+        private const val FILE_PATH = "file_path"
+        private const val FILE_TYPE = "file_type"
+        private const val FILE_LOCATION = "file_location"
+        private const val FILE_SIZE = "file_size"
     }
 }

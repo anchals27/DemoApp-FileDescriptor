@@ -6,7 +6,7 @@
     <data>
         <variable
             name="modelData"
-            type="com.example.filedescripter.MyDataClass" />
+            type="com.example.filedescripter.Model.MyDataClass" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

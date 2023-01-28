@@ -1,11 +1,10 @@
 package com.example.filedescripter.ViewModels
 
-import android.os.Environment
 import androidx.lifecycle.*
 import com.example.filedescripter.*
 import com.example.filedescripter.Model.ExplorerRepo
 import com.example.filedescripter.Model.IExplorerRepo
-import com.example.filedescripter.MyApplication.Companion.Instance
+import com.example.filedescripter.Model.MyDataClass
 import com.example.filedescripter.Services.CppHelper
 
 class AnalyticsFragmentVM(private val explorerRepo: IExplorerRepo) : ViewModel() {
