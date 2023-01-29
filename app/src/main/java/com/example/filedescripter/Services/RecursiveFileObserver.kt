@@ -6,7 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
-import com.example.filedescripter.Fragments.ExplorerFragment
+import com.example.filedescripter.View.ExplorerFragment
 import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.MyDataClass
 import com.example.filedescripter.Services.LocationServiceProvider

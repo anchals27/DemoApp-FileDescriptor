@@ -1,4 +1,4 @@
-package com.example.filedescripter.Fragments
+package com.example.filedescripter.View
 
 import android.content.ContentValues.TAG
 import android.util.Log
@@ -9,7 +9,6 @@ import com.example.filedescripter.MyDataClass
 import com.example.filedescripter.R
 import com.example.filedescripter.databinding.ListItemBinding
 import java.io.File
-import kotlin.math.exp
 
 class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
                                 private val explorerFragment: ExplorerFragment) : RecyclerView.Adapter<BaseViewHolder>() {
@@ -41,7 +40,9 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
             myView.typeTextView.text =  if (isDirectory) "Folder"
                                         else if (isFile) myDataClass.fileType
                                         else ""
+            myView.sizeTextView.text = ""
             if (isDirectory || isFile || myDataClass.fileId != "") {
+//                Log.d(TAG, "Anchal: setViewParameters: ${myDataClass.fileId}")
                 val fileSize = myDataClass.fileSize.toLong()
                 var displaySize : Long = 0
                 var unitType = ""

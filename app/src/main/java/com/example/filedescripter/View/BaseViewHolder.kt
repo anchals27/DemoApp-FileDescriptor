@@ -1,4 +1,4 @@
-package com.example.filedescripter.Fragments
+package com.example.filedescripter.View
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

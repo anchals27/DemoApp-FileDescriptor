@@ -20,9 +20,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.example.filedescripter.Fragments.AnalyticsFragment
-import com.example.filedescripter.Fragments.CreationDialog
-import com.example.filedescripter.Fragments.ExplorerFragment
+import com.example.filedescripter.View.AnalyticsFragment
+import com.example.filedescripter.View.CreationDialog
+import com.example.filedescripter.View.ExplorerFragment
 import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.Services.DirectoryParser
 import com.example.filedescripter.Services.LocationServiceProvider

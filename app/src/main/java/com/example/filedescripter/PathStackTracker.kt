@@ -1,12 +1,7 @@
 package com.example.filedescripter
 
-import android.os.Environment
-import android.view.View
 import android.widget.TextView
-import com.example.filedescripter.Fragments.ExplorerFragment
 import com.example.filedescripter.MyApplication.Companion.Instance
-import java.nio.file.Path
-import java.util.*
 
 class PathStackTracker(private val addressBar: TextView) {
     private val stack = mutableListOf<String>()

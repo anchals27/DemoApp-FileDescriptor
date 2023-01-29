@@ -1,4 +1,4 @@
-package com.example.filedescripter.Fragments
+package com.example.filedescripter.View
 
 import android.content.ContentValues.TAG
 import android.os.Bundle
@@ -6,12 +6,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.filedescripter.PathStackTracker
-import com.example.filedescripter.ViewModels.ExplorerFragmentVM
+import com.example.filedescripter.ViewModel.ExplorerFragmentVM
 import com.example.filedescripter.databinding.FragmentItemListBinding
 
 
