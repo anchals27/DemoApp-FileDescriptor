@@ -152,7 +152,7 @@ class RecursiveFileObserver(private val mPath: String,
         override fun onEvent(event: Int, path: String?) {
             val file: File = if (path == null) File(filePath) else File(filePath, path)
 
-            if (file.name[0] == '.') {
+            if (file.name[0] == '.' || (!file.isFile && !file.isDirectory)) {
                 return
             }
 
@@ -164,9 +164,9 @@ class RecursiveFileObserver(private val mPath: String,
                 }
                 DELETE -> {
                     Log.d(TAG, "Anchal: onEvent: DELETE ${file.path}")
+                    triggerFileDeletionNotification(file)
                     doRecursiveDeletionsAndUpdates(file)
                     explorerFragment.reloadList()
-                    triggerFileDeletionNotification(file)
                 }
                 CREATE -> {
                     if (file.name.contains(';') || file.name.contains(':')) {

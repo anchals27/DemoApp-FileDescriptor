@@ -13,8 +13,6 @@ import java.io.File
 
 class NotificationService(private val notificationManager: NotificationManager) {
     private val CHANNEL_ID = "File_Descriptor_Channel_Id"
-    private lateinit var fileCreationNotificationCompatBuilder: NotificationCompat.Builder
-    private lateinit var fileDeletionNotificationCompatBuilder: NotificationCompat.Builder
     private lateinit var pendingIntent : PendingIntent
 
     init {
@@ -44,7 +42,7 @@ class NotificationService(private val notificationManager: NotificationManager) 
     }
 
     fun getFileCreationNotificationBuilder(file: File) : NotificationCompat.Builder {
-        fileCreationNotificationCompatBuilder = NotificationCompat.Builder(Instance.applicationContext, CHANNEL_ID)
+        val fileCreationNotificationCompatBuilder = NotificationCompat.Builder(Instance.applicationContext, CHANNEL_ID)
             .setSmallIcon(if (file.isFile) R.drawable.icons8_file_64 else R.drawable.folder_icon)
             .setContentTitle("New ${if (file.isFile) "File" else "Folder"} Created")
             .setContentText(file.absolutePath)
@@ -56,7 +54,7 @@ class NotificationService(private val notificationManager: NotificationManager) 
     }
 
     fun getFileDeletionNotificationBuilder(file: File) : NotificationCompat.Builder {
-        fileDeletionNotificationCompatBuilder = NotificationCompat.Builder(Instance.applicationContext, CHANNEL_ID)
+        val fileDeletionNotificationCompatBuilder = NotificationCompat.Builder(Instance.applicationContext, CHANNEL_ID)
             .setSmallIcon(if (file.isFile) R.drawable.icons8_file_64 else R.drawable.folder_icon)
             .setContentTitle("${if (file.isFile) "File" else "Folder"} Deleted")
             .setContentText(file.absolutePath)

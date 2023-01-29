@@ -3,11 +3,17 @@ package com.example.filedescripter.View
 import android.content.ContentValues.TAG
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.MyDataClass
 import com.example.filedescripter.R
 import com.example.filedescripter.databinding.ListItemBinding
+import com.google.android.material.snackbar.Snackbar
 import java.io.File
 
 class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
@@ -15,18 +21,27 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
     class ListItemVH(private val myView: ListItemBinding,private val explorerFragment: ExplorerFragment) : BaseViewHolder(myView.root) {
         override fun bindData(position: Int, data: Any) {
             val myDataClass = data as MyDataClass
-            val isDirectory = File(myDataClass.filePath + myDataClass.fileName).isDirectory
-            val isFile = File(myDataClass.filePath + myDataClass.fileName).isFile
+            val file = File(myDataClass.filePath + myDataClass.fileName)
+            val isDirectory = file.isDirectory
+            val isFile = file.isFile
             myView.modelData = myDataClass
             setOnClickForRoot(myDataClass, isDirectory)
+            setOnClickForDeletion(file)
             setViewParameters(myDataClass, isDirectory, isFile)
+        }
+
+        private fun setOnClickForDeletion(file: File) {
+            myView.deleteImageView.setOnClickListener {
+                if (file.name == "Android") {
+                    Toast.makeText(Instance.applicationContext, "This folder should not be deleted", Toast.LENGTH_SHORT).show()
+                } else if (file.isFile || file.isDirectory)
+                    file.delete()
+            }
         }
 
         private fun setOnClickForRoot(myDataClass: MyDataClass, isDirectory: Boolean) {
             myView.root.setOnClickListener {
-                Log.d(TAG, "Anchal: bindData: $position ${myDataClass.fileName}")
                 if (isDirectory) {
-                    Log.d(TAG, "Anchal: bindData: moveToThisFolder")
                     explorerFragment.pathStackTracker.moveToThisFolder(myDataClass.fileName)
                     explorerFragment.reloadList()
                 }
@@ -41,8 +56,8 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
                                         else if (isFile) myDataClass.fileType
                                         else ""
             myView.sizeTextView.text = ""
+            myView.deleteImageView.isVisible = false
             if (isDirectory || isFile || myDataClass.fileId != "") {
-//                Log.d(TAG, "Anchal: setViewParameters: ${myDataClass.fileId}")
                 val fileSize = myDataClass.fileSize.toLong()
                 var displaySize : Long = 0
                 var unitType = ""
@@ -57,6 +72,8 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
                     unitType = "MB"
                 }
                 myView.sizeTextView.text = displaySize.toString() + unitType
+                myView.deleteImageView.isVisible = true
+                myView.deleteImageView.setImageResource(R.drawable.icons8_trash_50)
             }
         }
     }
