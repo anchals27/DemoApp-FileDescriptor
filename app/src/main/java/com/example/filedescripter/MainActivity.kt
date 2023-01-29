@@ -2,11 +2,8 @@ package com.example.filedescripter
 
 // import android.Manifest
 import RecursiveFileObserver
-import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
@@ -17,7 +14,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.util.Log
-import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -25,6 +21,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.filedescripter.Fragments.AnalyticsFragment
+import com.example.filedescripter.Fragments.CreationDialog
 import com.example.filedescripter.Fragments.ExplorerFragment
 import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.Services.DirectoryParser
@@ -32,6 +29,7 @@ import com.example.filedescripter.Services.LocationServiceProvider
 import com.example.filedescripter.Services.NotificationService
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class MainActivity : AppCompatActivity() {
@@ -67,6 +65,7 @@ class MainActivity : AppCompatActivity() {
             fileCreationObserver.startWatching()
         }
         setCallbackForBackButton()
+        setCallbackForFloatingActionButton()
     }
 
     override fun onRequestPermissionsResult(
@@ -148,6 +147,7 @@ class MainActivity : AppCompatActivity() {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.container, explorerFragment).commit()
                     curFragment = explorerFragment
+                    showFloatingActionButton(true)
                     true
                 }
                 R.id.Analytics -> {
@@ -156,11 +156,20 @@ class MainActivity : AppCompatActivity() {
                         analyticsFragment
                     ).commit()
                     curFragment = analyticsFragment
+                    showFloatingActionButton(false)
                     true
                 }
                 else -> false
             }
         }
+    }
+
+    private fun showFloatingActionButton(show: Boolean) {
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+        if (show)
+            fab.show()
+        else
+            fab.hide()
     }
 
     private fun createLocationService() {
@@ -196,6 +205,7 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "Anchal: goBackToParent: committing to analytics fragment")
             val menuItem = findViewById<BottomNavigationItemView>(R.id.Explorer)
             menuItem.performClick()
+            showFloatingActionButton(true)
             return
         }
         pathStackTracker.moveBack()
@@ -203,4 +213,10 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Anchal: onSupportNavigateUp: ")
     }
 
+    private fun setCallbackForFloatingActionButton() {
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+        fab.setOnClickListener {
+            CreationDialog.showDialog(layoutInflater, this, pathStackTracker.curPath)
+        }
+    }
 }

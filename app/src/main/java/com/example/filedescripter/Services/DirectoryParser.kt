@@ -27,6 +27,8 @@ class DirectoryParser {
         }
 
         private fun insertFileInfoToDB(it: File, size: Long) {
+            if (it.name.contains(':') || it.name.contains(';'))
+                return
             val data = MyDataClass(it.name,
                 it.absolutePath.hashCode().toString(),
                 it.parent?.plus("/") ?: DEFAULT_PATH,
