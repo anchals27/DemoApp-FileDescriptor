@@ -96,7 +96,7 @@ class RecursiveFileObserver(private val mPath: String,
     }
 
     private fun doRecursiveDeletionsAndUpdates(file: File) {
-        val prevSize = getPrevSizeOfFile(file)
+        val prevSize = getPrevSizeOfFile(file)!!
         doRecursiveDeletion(file)
         if (prevSize != null) {
             doCascadingUpdates(File(file.parent), -prevSize)
@@ -131,7 +131,6 @@ class RecursiveFileObserver(private val mPath: String,
             val fileId = file.absolutePath.hashCode().toString()
             val prevSize = getPrevSizeOfFile(file) ?: break
             val newSize = prevSize + deltaSize
-            Log.d(TAG, "Anchal: doCascadingUpdates: ${file.path} $deltaSize $newSize")
             Instance.dbHelper.updateOnlyFileSizeInDB(fileId, newSize.toString())
             file = File(file.parent)
         }
@@ -139,19 +138,18 @@ class RecursiveFileObserver(private val mPath: String,
 
     private fun insertFileInfoToDB(file: File) {
         val defaultPath = Environment.getExternalStorageDirectory().path + "/"
-//        Log.d(TAG, "Anchal: insertFileInfoToDB1: ")
+        val sizeOfFile = file.length()
         val data = MyDataClass(file.name,
             "${file.absolutePath.hashCode()}",
             file.parent?.plus("/") ?: defaultPath,
             if (file.isFile) file.extension else file.name,
             "",
-            if (file.isDirectory) "0" else file.length().toString())
+            if (file.isDirectory) "0" else sizeOfFile.toString())
 
-//        Log.d(TAG, "Anchal: insertFileInfoToDB2: ")
         Log.d(TAG, "Anchal: insertFileInfoToDB: $data ${file.absolutePath}")
         Instance.dbHelper.writeFileInfoToDB(data)
         if (file.isFile)
-            doCascadingUpdates(File(file.parent), file.length())
+            doCascadingUpdates(File(file.parent), sizeOfFile)
     }
 
     private inner class SingleFileObserver(private val filePath: String, mask: Int) :

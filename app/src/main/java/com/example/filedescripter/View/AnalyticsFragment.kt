@@ -61,7 +61,7 @@ class AnalyticsFragment : Fragment() {
         val pieChart = view.findViewById<PieChart>(R.id.pieChart)
         for ((key, value) in mapping) {
             val percentage = if (totalSize == (0).toLong()) 100 else value * 100 / (totalSize)
-            var segmentPair = Segment("$key $percentage%", value)
+            var segmentPair = Segment("${key.ifEmpty { "others" }} $percentage%", value)
             Log.d(TAG, "Anchal: updatePieChart: $key, $value $percentage%")
             if (percentage < 1) {
                 Log.d(TAG, "Anchal: updatePieChart: less than 1")
