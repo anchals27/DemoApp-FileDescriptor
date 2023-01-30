@@ -18,7 +18,7 @@ import com.example.filedescripter.ViewModel.AnalyticsFragmentVM
 import com.example.filedescripter.R
 import com.example.filedescripter.databinding.FragmentAnalyticsBinding
 
-class AnalyticsFragment(private val pathStackTracker: PathStackTracker) : Fragment() {
+class AnalyticsFragment : Fragment() {
     private lateinit var _binding: FragmentAnalyticsBinding
     private lateinit var _viewModel: AnalyticsFragmentVM
     private val colorList = listOf(Color.RED, Color.GREEN, Color.DKGRAY, Color.BLUE, Color.MAGENTA, Color.GRAY)
@@ -37,7 +37,7 @@ class AnalyticsFragment(private val pathStackTracker: PathStackTracker) : Fragme
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "Anchal: AnalyticsFragment: onViewCreated: ")
-        val mapping = _viewModel.getTypeToSizeMapping(pathStackTracker.curPath)
+        val mapping = _viewModel.getTypeToSizeMapping(PathStackTracker.curPath)
         updatePieChart(mapping, view)
     }
 

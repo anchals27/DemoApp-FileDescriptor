@@ -7,8 +7,8 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.location.Location
 import android.util.Log
-import com.example.filedescripter.Services.DirectoryParser
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -142,11 +142,11 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
                 fileLocation = cursor.getString(cursor.getColumnIndex(FILE_LOCATION)),
             )
             cursor.close()
-            db.close()
+//            db.close()
             return myDataClass
         } else {
             cursor.close()
-            db.close()
+//            db.close()
             return null
         }
     }
@@ -158,7 +158,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
                 "WHERE $FILE_ID = '$fileId'"
         Log.d(TAG, "Anchal: Update Query: $query")
         db.execSQL(query)
-        db.close()
+//        db.close()
     }
 
     fun checkFileExistInDB(fileId: String): Boolean {
@@ -166,7 +166,9 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         val query = "SELECT $FILE_ID FROM $TABLE_NAME WHERE $FILE_ID = $fileId"
         Log.d(TAG, "Anchal: InsertInfo: checkFileExistInDB: $query")
         val cursor = db.rawQuery(query, null)
-        return cursor.moveToFirst()
+        val ret: Boolean = cursor.moveToFirst()
+        cursor.close()
+        return ret
     }
 
     fun deleteFileFromDB(file: File) {
@@ -176,8 +178,17 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         Log.d(TAG, "Anchal: Delete Query: $query")
         db.execSQL(query)
         Log.d(TAG, "Anchal: deleteFileFromDB: $file")
-        db.close()
     }
+
+    fun updateOnlyLocation(fileId: String, location: String) {
+        val db = this.writableDatabase
+        val query = "UPDATE $TABLE_NAME " +
+                "SET $FILE_LOCATION = '$location' " +
+                "WHERE $FILE_ID = '$fileId'"
+        Log.d(TAG, "Anchal: Update Query: $query")
+        db.execSQL(query)
+    }
+
 
     companion object{
         // here we have defined variables for our database

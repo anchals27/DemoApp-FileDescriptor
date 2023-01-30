@@ -1,5 +1,6 @@
 package com.example.filedescripter.Services
 
+import RecursiveFileObserver
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
@@ -8,70 +9,52 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+import android.os.Build
 import android.os.Looper.*
 import android.provider.Settings
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
+import java.util.*
 
 
 class LocationServiceProvider(
-    private val context: Context, private val locationManager: LocationManager
+    private val context: Context, private val locationServices: FusedLocationProviderClient
 ) {
     private val LOCATION_NOT_AVAILABLE = ""
     private var currentLocation : Location? = null
 
-    fun getLastLocation() : String {
-        if (currentLocation == null)
-            return ""
-        val latitude : Int = (currentLocation!!.latitude).toInt()
-        val longitude : Int = (currentLocation!!.longitude).toInt()
-
-        val myLocation = "$latitude, $longitude"
-        Log.d(TAG, "Anchal: getLastLocation: $myLocation")
-
-        return myLocation
-    }
-
-
+    @RequiresApi(Build.VERSION_CODES.Q)
     @SuppressLint("MissingPermission")
-    fun startTrackingLocation() {
-///        var currentLocation: Location? = null
-//        val myLocation: String
-
+    fun getLastLocation(recursiveFileObserver: RecursiveFileObserver, fileId: String): String? {
         if (!isLocationPermissionGranted() || !isLocationEnabled()) {
-            return
+            return null
         }
 
-        val hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        Log.d(TAG, "Anchal: startTrackingLocation: $hasGps")
-        if (hasGps) {
-            locationManager.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER,
-                500L,
-                0f
-            ) { location: Location ->
-                currentLocation = location
-//                Log.d(TAG, "Anchal: getLastLocation: Hitting here")
-            }
+        locationServices.lastLocation.addOnCompleteListener { task ->
+            val location: Location? = task.result
+            currentLocation = location
+            val strLocation = getLatLong(location)
+            recursiveFileObserver.updateLocationInDB(fileId, strLocation)
+            Log.d(TAG, "Anchal: getLastLocation: $location")
         }
-
-        Log.d(TAG, "Anchal: startTrackingLocation: $currentLocation")
-        if (currentLocation == null) {
-            val lastKnownLocationByGps =
-                locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            Log.d(TAG, "Anchal: getLastLocation: $lastKnownLocationByGps")
-            lastKnownLocationByGps?.let {
-                currentLocation = lastKnownLocationByGps
-            }
-        }
-
-        if (currentLocation == null) {
-            Log.d(TAG, "Anchal: getLastLocation: null")
-            return
-        }
-
+//        currentLocation = location
+        return getLatLong(currentLocation)
     }
+
+    private fun getLatLong(location: Location?): String {
+        if (location != null) {
+            val latitude: Int? = (location?.latitude)?.toInt()
+            val longitude: Int? = (location?.longitude)?.toInt()
+
+            val myLocation = "$latitude, $longitude"
+            Log.d(TAG, "Anchal: getLastLocation: $myLocation")
+            return myLocation
+        }
+        return ""
+    }
+
 
     fun isLocationPermissionGranted() : Boolean {
         return ActivityCompat.checkSelfPermission(

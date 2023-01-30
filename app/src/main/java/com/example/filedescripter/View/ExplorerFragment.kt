@@ -17,7 +17,7 @@ import com.example.filedescripter.databinding.FragmentItemListBinding
 /**
  * A fragment representing a list of Items.
  */
-class ExplorerFragment(val pathStackTracker: PathStackTracker) : Fragment() {
+class ExplorerFragment() : Fragment() {
 
     private lateinit var _binding: FragmentItemListBinding
     private lateinit var _viewModel: ExplorerFragmentVM
@@ -49,11 +49,11 @@ class ExplorerFragment(val pathStackTracker: PathStackTracker) : Fragment() {
                 Log.d(TAG, "Anchal: onViewCreated: list is null")
             }
         }
-        _viewModel.getDirectoryList(pathStackTracker.curPath)
+        _viewModel.getDirectoryList(PathStackTracker.curPath)
     }
 
     fun reloadList() {
-        _viewModel.getDirectoryList(pathStackTracker.curPath)
+        _viewModel.getDirectoryList(PathStackTracker.curPath)
     }
 
 }

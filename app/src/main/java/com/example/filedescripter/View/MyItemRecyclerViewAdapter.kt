@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.MyDataClass
+import com.example.filedescripter.PathStackTracker
 import com.example.filedescripter.R
 import com.example.filedescripter.databinding.ListItemBinding
 import com.google.android.material.snackbar.Snackbar
@@ -43,7 +44,7 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
         private fun setOnClickForRoot(myDataClass: MyDataClass, isDirectory: Boolean) {
             myView.root.setOnClickListener {
                 if (isDirectory) {
-                    explorerFragment.pathStackTracker.moveToThisFolder(myDataClass.fileName)
+                    PathStackTracker.moveToThisFolder(myDataClass.fileName)
                     explorerFragment.reloadList()
                 }
             }

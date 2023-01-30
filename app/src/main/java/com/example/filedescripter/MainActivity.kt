@@ -27,6 +27,7 @@ import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.Services.DirectoryParser
 import com.example.filedescripter.Services.LocationServiceProvider
 import com.example.filedescripter.Services.NotificationService
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     private val STORAGE_PERMISSION_CODE = 101
     private var isDBLoaded = false
-    private lateinit var pathStackTracker : PathStackTracker
+//    private lateinit var pathStackTracker : PathStackTracker
     private lateinit var locationServiceProvider : LocationServiceProvider
     private lateinit var locationManager: LocationManager
     private lateinit var explorerFragment : ExplorerFragment
@@ -44,6 +45,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fileCreationObserver: RecursiveFileObserver
     private lateinit var notificationService: NotificationService
     private var curFragment: Fragment? = null
+    private var addressBar : TextView? = null
     private val CHANNEL_ID = "1"
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -53,14 +55,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         createLocationService()
-        val addressBar = findViewById<TextView>(R.id.addressBar)
-        pathStackTracker = PathStackTracker(addressBar)
-        explorerFragment = ExplorerFragment(pathStackTracker)
-        analyticsFragment = AnalyticsFragment(pathStackTracker)
+        PathStackTracker.addressBar = findViewById(R.id.addressBar)
+        PathStackTracker.addressBar?.text = Instance.STARTING_PATH
+        explorerFragment = ExplorerFragment()
+        analyticsFragment = AnalyticsFragment()
         notificationService = NotificationService(getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
         setUpFragments()
         if (SDK_INT >= Build.VERSION_CODES.Q) {
-            fileCreationObserver = RecursiveFileObserver(pathStackTracker.curPath, locationServiceProvider,
+            fileCreationObserver = RecursiveFileObserver(Instance.STARTING_PATH, locationServiceProvider,
                                                             explorerFragment, notificationService)
             fileCreationObserver.startWatching()
         }
@@ -133,7 +135,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun doStartupProcesses() {
-        locationServiceProvider.startTrackingLocation()
         doLoadingOfDB()
     }
 
@@ -173,8 +174,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createLocationService() {
-        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-        locationServiceProvider = LocationServiceProvider(this, locationManager)
+//        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        locationServiceProvider = LocationServiceProvider(this, fusedLocationClient)
     }
 
     private fun doLoadingOfDB() {
@@ -191,7 +193,7 @@ class MainActivity : AppCompatActivity() {
     private fun setCallbackForBackButton() {
         val callback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (pathStackTracker.curPath != Instance.STARTING_PATH)
+                if (PathStackTracker.curPath != Instance.STARTING_PATH)
                     goBackToParent()
                 else
                     finish()
@@ -208,7 +210,7 @@ class MainActivity : AppCompatActivity() {
             showFloatingActionButton(true)
             return
         }
-        pathStackTracker.moveBack()
+        PathStackTracker.moveBack()
         explorerFragment.reloadList()
         Log.d(TAG, "Anchal: onSupportNavigateUp: ")
     }
@@ -216,7 +218,7 @@ class MainActivity : AppCompatActivity() {
     private fun setCallbackForFloatingActionButton() {
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
-            CreationDialog.showDialog(layoutInflater, this, pathStackTracker.curPath)
+            CreationDialog.showDialog(layoutInflater, this, PathStackTracker.curPath)
         }
     }
 }

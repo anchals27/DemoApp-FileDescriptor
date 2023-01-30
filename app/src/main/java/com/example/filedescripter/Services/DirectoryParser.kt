@@ -33,14 +33,14 @@ class DirectoryParser {
                 it.absolutePath.hashCode().toString(),
                 it.parent?.plus("/") ?: DEFAULT_PATH,
                 if (it.isFile) it.extension else it.name,
-                location,
+                "",
                 size.toString())
-            Log.d(TAG, "Anchal: insertFileInfoToDB: $data ${it.absolutePath} ${it.length()}")
+            // Log.d(TAG, "Anchal: insertFileInfoToDB: $data ${it.absolutePath} ${it.length()}")
             Instance.dbHelper.writeFileInfoToDB(data)
         }
 
         fun doParsingOfInternalStorage(locationServiceProvider: LocationServiceProvider) {
-            location = locationServiceProvider.getLastLocation()
+            //location = locationServiceProvider.getLastLocation().toString()
             doRecursiveWalkOnExternalStorage(File(DEFAULT_PATH))
         }
     }
