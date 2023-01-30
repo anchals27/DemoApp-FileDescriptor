@@ -104,7 +104,12 @@ class RecursiveFileObserver(private val mPath: String,
 
     private fun doUpdateInDBForFile(file: File) {
         val prevSize = getPrevSizeOfFile(file)
-        Instance.dbHelper.updateFileSizeInDB(file)
+        if (!Instance.dbHelper.checkFileExistInDB(file.absolutePath.hashCode().toString())) {
+            val location = locationServiceProvider.getLastLocation()
+            insertFileInfoToDB(file, location)
+            return
+        }
+        Instance.dbHelper.updateOnlyFileSizeInDB(file.absolutePath.hashCode().toString(), file.length().toString())
         if (prevSize != null) {
             val newSize = file.length()
             val deltaSize = newSize - prevSize
@@ -152,7 +157,7 @@ class RecursiveFileObserver(private val mPath: String,
         override fun onEvent(event: Int, path: String?) {
             val file: File = if (path == null) File(filePath) else File(filePath, path)
 
-            if (file.name[0] == '.' || (!file.isFile && !file.isDirectory)) {
+            if (file.name[0] == '.') {
                 return
             }
 

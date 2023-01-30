@@ -34,8 +34,9 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
             myView.deleteImageView.setOnClickListener {
                 if (file.name == "Android") {
                     Toast.makeText(Instance.applicationContext, "This folder should not be deleted", Toast.LENGTH_SHORT).show()
-                } else if (file.isFile || file.isDirectory)
+                } else
                     file.delete()
+                Log.d(TAG, "Anchal: setOnClickForDeletion: $file ${file.isFile} ${file.isDirectory}")
             }
         }
 
@@ -58,8 +59,8 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
             myView.sizeTextView.text = ""
             myView.deleteImageView.isVisible = false
             if (isDirectory || isFile || myDataClass.fileId != "") {
-                val fileSize = myDataClass.fileSize.toLong()
-                var displaySize : Long = 0
+                val fileSize = myDataClass.fileSize.toFloat()
+                var displaySize : Float = 0f
                 var unitType = ""
                 if (fileSize < 1024) {
                     displaySize = fileSize
@@ -71,7 +72,7 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
                     displaySize = fileSize / (1024 * 1024)
                     unitType = "MB"
                 }
-                myView.sizeTextView.text = displaySize.toString() + unitType
+                myView.sizeTextView.text = String.format("%.2f", displaySize) + unitType
                 myView.deleteImageView.isVisible = true
                 myView.deleteImageView.setImageResource(R.drawable.icons8_trash_50)
             }

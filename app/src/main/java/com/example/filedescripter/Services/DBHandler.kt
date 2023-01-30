@@ -161,23 +161,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         db.close()
     }
 
-    fun  updateFileSizeInDB(file: File) {
-        Log.d(TAG, "Anchal: updateFileSizeInDB: $file")
-        if (!checkFileExistInDB(file.absolutePath.hashCode().toString())) {
-            val data = MyDataClass(file.name,
-                file.absolutePath.hashCode().toString(),
-                file.parent + "/",
-                if (file.isFile) file.extension else file.name,
-                "",
-                file.length().toString())
-            writeFileInfoToDB(data)
-            return
-        }
-        Log.d(TAG, "Anchal: updateFileSizeInDB: ")
-        updateOnlyFileSizeInDB(file.absolutePath.hashCode().toString(), file.length().toString())
-    }
-
-    private fun checkFileExistInDB(fileId: String): Boolean {
+    fun checkFileExistInDB(fileId: String): Boolean {
         val db = this.readableDatabase
         val query = "SELECT $FILE_ID FROM $TABLE_NAME WHERE $FILE_ID = $fileId"
         Log.d(TAG, "Anchal: InsertInfo: checkFileExistInDB: $query")
