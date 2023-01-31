@@ -137,17 +137,8 @@ class RecursiveFileObserver(private val mPath: String,
     }
 
     private fun insertFileInfoToDB(file: File) {
-        val defaultPath = Environment.getExternalStorageDirectory().path + "/"
         val sizeOfFile = file.length()
-        val data = MyDataClass(file.name,
-            "${file.absolutePath.hashCode()}",
-            file.parent?.plus("/") ?: defaultPath,
-            if (file.isFile) file.extension else file.name,
-            "",
-            if (file.isDirectory) "0" else sizeOfFile.toString())
-
-        Log.d(TAG, "Anchal: insertFileInfoToDB: $data ${file.absolutePath}")
-        Instance.dbHelper.writeFileInfoToDB(data)
+        Instance.dbHelper.insertFileInfoToDB(file, sizeOfFile)
         if (file.isFile)
             doCascadingUpdates(File(file.parent), sizeOfFile)
     }

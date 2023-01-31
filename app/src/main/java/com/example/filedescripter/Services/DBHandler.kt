@@ -8,7 +8,9 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.location.Location
+import android.os.Environment
 import android.util.Log
+import com.example.filedescripter.MyApplication.Companion.Instance
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -149,6 +151,19 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
 //            db.close()
             return null
         }
+    }
+
+    fun insertFileInfoToDB(file: File, sizeOfFile: Long) {
+        val defaultPath = Environment.getExternalStorageDirectory().path + "/"
+        val data = MyDataClass(file.name,
+            "${file.absolutePath.hashCode()}",
+            file.parent?.plus("/") ?: defaultPath,
+            if (file.isFile) file.extension else file.name,
+            "",
+            if (file.isDirectory) "0" else sizeOfFile.toString())
+
+        Log.d(TAG, "Anchal: insertFileInfoToDB: $data ${file.absolutePath}")
+        Instance.dbHelper.writeFileInfoToDB(data)
     }
 
     fun updateOnlyFileSizeInDB(fileId: String, fileSize: String) {

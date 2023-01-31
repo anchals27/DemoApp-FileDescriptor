@@ -13,6 +13,7 @@ import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.MyDataClass
 import com.example.filedescripter.PathStackTracker
 import com.example.filedescripter.R
+import com.example.filedescripter.Services.DirectoryParser
 import com.example.filedescripter.databinding.ListItemBinding
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
@@ -33,12 +34,22 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
 
         private fun setOnClickForDeletion(file: File) {
             myView.deleteImageView.setOnClickListener {
-                if (file.name == "Android") {
+                if (PathStackTracker.curPath == Instance.STARTING_PATH) {
                     Toast.makeText(Instance.applicationContext, "This folder should not be deleted", Toast.LENGTH_SHORT).show()
-                } else
-                    file.delete()
+                } else {
+                    deleteFolder(file)
+                }
                 Log.d(TAG, "Anchal: setOnClickForDeletion: $file ${file.isFile} ${file.isDirectory}")
             }
+        }
+
+        private fun deleteFolder(file: File) {
+            if (file.isDirectory) {
+                file.listFiles()?.forEach {
+                    deleteFolder(it)
+                }
+            }
+            file.delete()
         }
 
         private fun setOnClickForRoot(myDataClass: MyDataClass, isDirectory: Boolean) {
@@ -51,6 +62,7 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
         }
 
         private fun setViewParameters(myDataClass: MyDataClass, isDirectory: Boolean, isFile: Boolean) {
+            val isOnStartingPath = PathStackTracker.curPath == Instance.STARTING_PATH
             myView.myImage.setImageResource(if (isDirectory) R.drawable.folder_icon
             else if (isFile) R.drawable.icons8_file_64
             else R.drawable.icons8_question_mark_48)
@@ -76,6 +88,7 @@ class MyItemRecyclerViewAdapter(private val fileList : ArrayList<MyDataClass>,
                 myView.sizeTextView.text = String.format("%.2f", displaySize) + unitType
                 myView.deleteImageView.isVisible = true
                 myView.deleteImageView.setImageResource(R.drawable.icons8_trash_50)
+                myView.deleteImageView.alpha = if (isOnStartingPath) 0.1f else 1.0f
             }
         }
     }
