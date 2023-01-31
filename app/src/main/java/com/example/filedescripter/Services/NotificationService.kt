@@ -3,6 +3,7 @@ package com.example.filedescripter.Services
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
@@ -11,9 +12,10 @@ import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.R
 import java.io.File
 
-class NotificationService(private val notificationManager: NotificationManager) {
+object NotificationService {
     private val CHANNEL_ID = "File_Descriptor_Channel_Id"
     private lateinit var pendingIntent : PendingIntent
+    private var notificationManager: NotificationManager = Instance.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
     init {
         createNotificationChannel()

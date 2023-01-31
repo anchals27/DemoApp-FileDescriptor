@@ -22,7 +22,6 @@ import java.util.*
 class RecursiveFileObserver(private val mPath: String,
                             private val fusedLocationProviderClient: FusedLocationProviderClient,
                             private val explorerFragment: ExplorerFragment,
-                            private val notificationService: NotificationService,
                             private val mask: Int = ALL_EVENTS) :
     FileObserver(File(mPath), mask) {
     private val mObservers: MutableMap<String, FileObserver?> = HashMap()
@@ -190,13 +189,13 @@ class RecursiveFileObserver(private val mPath: String,
 
     fun triggerFileCreationNotification(file: File) {
         with(NotificationManagerCompat.from(Instance.applicationContext)) {
-            notify(1, notificationService.getFileCreationNotificationBuilder(file).build())
+            notify(1, NotificationService.getFileCreationNotificationBuilder(file).build())
         }
     }
 
     fun triggerFileDeletionNotification(file: File) {
         with(NotificationManagerCompat.from(Instance.applicationContext)) {
-            notify(1, notificationService.getFileDeletionNotificationBuilder(file).build())
+            notify(1, NotificationService.getFileDeletionNotificationBuilder(file).build())
         }
     }
 

@@ -2,7 +2,6 @@ package com.example.filedescripter
 
 // import android.Manifest
 import RecursiveFileObserver
-import android.app.NotificationManager
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -38,7 +37,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var explorerFragment : ExplorerFragment
     private lateinit var analyticsFragment : AnalyticsFragment
     private lateinit var fileCreationObserver: RecursiveFileObserver
-    private lateinit var notificationService: NotificationService
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private var curFragment: Fragment? = null
 
@@ -53,11 +51,10 @@ class MainActivity : AppCompatActivity() {
         PathStackTracker.addressBar?.text = Instance.STARTING_PATH
         explorerFragment = ExplorerFragment()
         analyticsFragment = AnalyticsFragment()
-        notificationService = NotificationService(getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
         setUpFragments()
         if (SDK_INT >= Build.VERSION_CODES.Q) {
             fileCreationObserver = RecursiveFileObserver(Instance.STARTING_PATH, fusedLocationClient,
-                                                            explorerFragment, notificationService)
+                                                            explorerFragment)
             fileCreationObserver.startWatching()
         }
         setCallbackForBackButton()
