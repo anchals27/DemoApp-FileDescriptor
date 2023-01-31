@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FileDescripter</string>
+    <string name="app_name">FileDescriptor</string>
     <string name="title_item">Item</string>
     <string name="test_desc">test desc</string>
     <string name="sample_text">Sample Text</string>
