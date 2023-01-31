@@ -62,9 +62,8 @@ void doAnalysis(std::string &cppStr, string &results) {
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_example_filedescripter_Services_CppHelper_00024Companion_getAnalysisFromCpp(JNIEnv *env,
-                                                                                     jobject thiz,
-                                                                                     jstring str) {
+Java_com_example_filedescripter_Services_CppHelper_getAnalysisFromCpp(JNIEnv *env, jobject thiz,
+                                                                      jstring str) {
     string cppStr = jstring2string(env, str);
     string results;
 

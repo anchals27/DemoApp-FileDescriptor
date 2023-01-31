@@ -4,15 +4,13 @@ import android.content.ContentValues.TAG
 import android.util.Log
 import com.example.filedescripter.MyDataClass
 
-class CppHelper : ICppHelper {
+object CppHelper : ICppHelper {
 
-    companion object {
-        init {
-            System.loadLibrary("filedescripter")
-        }
-
-        external fun getAnalysisFromCpp(string: String) : String
+    init {
+        System.loadLibrary("filedescripter")
     }
+
+    private external fun getAnalysisFromCpp(string: String) : String
 
     private fun convertListToString(list: List<MyDataClass>) : String {
         var str = String()

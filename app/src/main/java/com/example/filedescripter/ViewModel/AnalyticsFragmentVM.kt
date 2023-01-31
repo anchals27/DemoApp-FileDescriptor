@@ -8,16 +8,13 @@ import com.example.filedescripter.Services.CppHelper
 
 class AnalyticsFragmentVM(private val explorerRepo: IExplorerRepo) : ViewModel() {
 
-//    private var curPath = Environment.getExternalStorageDirectory().path + "/"
-    private val cppHelper = CppHelper()
-
     fun getTypeToSizeMapping(curPath: String): Map<String, Long> {
         val list = explorerRepo.getFilesInfoData(curPath)
         return doAnalysis(list)
     }
 
     private fun doAnalysis(list: List<MyDataClass>) : Map<String, Long> {
-        return cppHelper.doAnalysisWithJNI(list)
+        return CppHelper.doAnalysisWithJNI(list)
     }
 
     companion object {
