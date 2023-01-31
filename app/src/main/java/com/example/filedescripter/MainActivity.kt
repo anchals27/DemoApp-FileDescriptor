@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
@@ -14,20 +13,19 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.util.Log
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.example.filedescripter.View.AnalyticsFragment
-import com.example.filedescripter.View.CreationDialog
-import com.example.filedescripter.View.ExplorerFragment
 import com.example.filedescripter.MyApplication.Companion.Instance
 import com.example.filedescripter.Services.DirectoryParser
 import com.example.filedescripter.Services.LocationServiceProvider
 import com.example.filedescripter.Services.NotificationService
-import com.google.android.gms.location.LocationServices
+import com.example.filedescripter.View.AnalyticsFragment
+import com.example.filedescripter.View.CreationDialog
+import com.example.filedescripter.View.ExplorerFragment
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -37,16 +35,12 @@ class MainActivity : AppCompatActivity() {
 
     private val STORAGE_PERMISSION_CODE = 101
     private var isDBLoaded = false
-//    private lateinit var pathStackTracker : PathStackTracker
-    private lateinit var locationServiceProvider : LocationServiceProvider
-    private lateinit var locationManager: LocationManager
     private lateinit var explorerFragment : ExplorerFragment
     private lateinit var analyticsFragment : AnalyticsFragment
     private lateinit var fileCreationObserver: RecursiveFileObserver
     private lateinit var notificationService: NotificationService
+    private lateinit var fusedLocationClient : FusedLocationProviderClient
     private var curFragment: Fragment? = null
-    private var addressBar : TextView? = null
-    private val CHANNEL_ID = "1"
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Anchal: onCreate: OnCreate being called ********************")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        createLocationService()
+        fusedLocationClient = FusedLocationProviderClient(this)
         PathStackTracker.addressBar = findViewById(R.id.addressBar)
         PathStackTracker.addressBar?.text = Instance.STARTING_PATH
         explorerFragment = ExplorerFragment()
@@ -62,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         notificationService = NotificationService(getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
         setUpFragments()
         if (SDK_INT >= Build.VERSION_CODES.Q) {
-            fileCreationObserver = RecursiveFileObserver(Instance.STARTING_PATH, locationServiceProvider,
+            fileCreationObserver = RecursiveFileObserver(Instance.STARTING_PATH, fusedLocationClient,
                                                             explorerFragment, notificationService)
             fileCreationObserver.startWatching()
         }
@@ -114,7 +108,7 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         Log.d(TAG, "Anchal: onStart")
 
-        if (!locationServiceProvider.isLocationPermissionGranted()) {
+        if (!LocationServiceProvider.isLocationPermissionGranted()) {
             requestPermissionForLocation()
             return
         }
@@ -124,8 +118,8 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        if (!locationServiceProvider.isLocationEnabled()) {
-            locationServiceProvider.startIntentToEnableLocation()
+        if (!LocationServiceProvider.isLocationEnabled()) {
+            LocationServiceProvider.startIntentToEnableLocation()
             return
         }
 
@@ -173,17 +167,11 @@ class MainActivity : AppCompatActivity() {
             fab.hide()
     }
 
-    private fun createLocationService() {
-//        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        locationServiceProvider = LocationServiceProvider(this, fusedLocationClient)
-    }
-
     private fun doLoadingOfDB() {
         if (!isDBLoaded) {
             isDBLoaded = true
             Log.d(TAG, "Anchal: doLoadingOfDB: Loading")
-            DirectoryParser.doParsingOfInternalStorage(locationServiceProvider)
+            DirectoryParser.doParsingOfInternalStorage()
         } else {
             Log.d(TAG, "Anchal: doLoadingOfDB: Loading avoided")
             Toast.makeText(this, "Database already loaded", Toast.LENGTH_SHORT).show()

@@ -7,13 +7,11 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.location.Location
 import android.os.Environment
 import android.util.Log
 import com.example.filedescripter.MyApplication.Companion.Instance
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
@@ -74,15 +72,8 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     }
 
     private fun getDataFromDB(curDirectory: String, db: SQLiteDatabase): Cursor {
-//        val db = this.readableDatabase
         val query = "SELECT * FROM $TABLE_NAME WHERE $FILE_PATH = '$curDirectory'"
-//         val query = "SELECT * FROM $TABLE_NAME"
         Log.d(TAG, "Anchal: getDataFromDB: $query")
-
-//        return db.query(TABLE_NAME, arrayOf(FILE_NAME), null,
-//            null, null, null, null)
-
-        //        db.close()
         return db.rawQuery(query, null)
     }
 
@@ -102,12 +93,9 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
                     cursor.getColumnIndex(FILE_TYPE) < 0 ||
                     cursor.getColumnIndex(FILE_LOCATION) < 0) {
 //                    Log.d(TAG, "Anchal: getContentsFromDB: cursor < 0, col_count: ${cursor.columnCount}")
-//                    return listOf(MyDataClass("Oops! You Ran into a problem, Col index < 0!!"))
                     return ArrayList(listOf(MyDataClass("Oops! You Ran into a problem, Col index < 0!!")))
                 } else {
 //                    Log.d(TAG, "Anchal: one reading adding ${index}")
-//                    Log.d(TAG, "Anchal: Cursor getString: ${cursor.getString(index)} -- $curDirectory")
-//                    if (cursor.getString(index) + "/" == curDirectory)
                     list.add(
                         MyDataClass(
                             fileName = cursor.getString(cursor.getColumnIndex(FILE_NAME)),
@@ -207,14 +195,14 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
 
     companion object{
         // here we have defined variables for our database
-        private val DATABASE_NAME = "FILE_DESCRIPTOR_DB"
-        private val DATABASE_VERSION = 1
-        val TABLE_NAME = "files_table"
-        val FILE_NAME = "file_name"
-        val FILE_ID = "file_id"
-        val FILE_PATH = "file_path"
-        val FILE_TYPE = "file_type"
-        val FILE_LOCATION = "file_location"
-        val FILE_SIZE = "file_size"
+        private const val DATABASE_NAME     = "FILE_DESCRIPTOR_DB"
+        private const val DATABASE_VERSION  = 1
+        private const val TABLE_NAME        = "files_table"
+        private const val FILE_NAME         = "file_name"
+        private const val FILE_ID           = "file_id"
+        private const val FILE_PATH         = "file_path"
+        private const val FILE_TYPE         = "file_type"
+        private const val FILE_LOCATION     = "file_location"
+        private const val FILE_SIZE         = "file_size"
     }
 }

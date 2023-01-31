@@ -1,17 +1,15 @@
 import android.content.ContentValues.TAG
-import android.location.Location
 import android.os.Build
-import android.os.Environment
 import android.os.FileObserver
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
-import com.example.filedescripter.View.ExplorerFragment
 import com.example.filedescripter.MyApplication.Companion.Instance
-import com.example.filedescripter.MyDataClass
 import com.example.filedescripter.Services.LocationServiceProvider
 import com.example.filedescripter.Services.NotificationService
+import com.example.filedescripter.View.ExplorerFragment
+import com.google.android.gms.location.FusedLocationProviderClient
 import java.io.File
 import java.util.*
 
@@ -22,7 +20,7 @@ import java.util.*
  */
 @RequiresApi(Build.VERSION_CODES.Q)
 class RecursiveFileObserver(private val mPath: String,
-                            private val locationServiceProvider: LocationServiceProvider,
+                            private val fusedLocationProviderClient: FusedLocationProviderClient,
                             private val explorerFragment: ExplorerFragment,
                             private val notificationService: NotificationService,
                             private val mask: Int = ALL_EVENTS) :
@@ -98,9 +96,7 @@ class RecursiveFileObserver(private val mPath: String,
     private fun doRecursiveDeletionsAndUpdates(file: File) {
         val prevSize = getPrevSizeOfFile(file)!!
         doRecursiveDeletion(file)
-        if (prevSize != null) {
-            doCascadingUpdates(File(file.parent), -prevSize)
-        }
+        doCascadingUpdates(File(file.parent!!), -prevSize)
     }
 
     private fun doUpdateInDBForFile(file: File) {
@@ -108,14 +104,14 @@ class RecursiveFileObserver(private val mPath: String,
         val fileId = file.absolutePath.hashCode().toString()
         if (!Instance.dbHelper.checkFileExistInDB(fileId)) {
             insertFileInfoToDB(file)
-            locationServiceProvider.getLastLocation(this, fileId)
+            LocationServiceProvider.getLastLocation(this, fileId, fusedLocationProviderClient)
             return
         }
         Instance.dbHelper.updateOnlyFileSizeInDB(file.absolutePath.hashCode().toString(), file.length().toString())
         if (prevSize != null) {
             val newSize = file.length()
             val deltaSize = newSize - prevSize
-            val parentFile = File(file.parent)
+            val parentFile = File(file.parent!!)
             doCascadingUpdates(parentFile, deltaSize)
         }
     }
@@ -132,7 +128,7 @@ class RecursiveFileObserver(private val mPath: String,
             val prevSize = getPrevSizeOfFile(file) ?: break
             val newSize = prevSize + deltaSize
             Instance.dbHelper.updateOnlyFileSizeInDB(fileId, newSize.toString())
-            file = File(file.parent)
+            file = File(file.parent!!)
         }
     }
 
@@ -140,7 +136,7 @@ class RecursiveFileObserver(private val mPath: String,
         val sizeOfFile = file.length()
         Instance.dbHelper.insertFileInfoToDB(file, sizeOfFile)
         if (file.isFile)
-            doCascadingUpdates(File(file.parent), sizeOfFile)
+            doCascadingUpdates(File(file.parent!!), sizeOfFile)
     }
 
     private inner class SingleFileObserver(private val filePath: String, mask: Int) :
@@ -176,7 +172,9 @@ class RecursiveFileObserver(private val mPath: String,
                     }
                     Log.d(TAG, "Anchal: onEvent: CREATE insertInfo trig")
                     insertFileInfoToDB(file)
-                    locationServiceProvider.getLastLocation(this@RecursiveFileObserver, file.absolutePath.hashCode().toString())
+                    LocationServiceProvider.getLastLocation(this@RecursiveFileObserver,
+                                                            file.absolutePath.hashCode().toString(),
+                                                            fusedLocationProviderClient)
                     Log.d(TAG, "Anchal: onEvent: CREATE inserted")
                     explorerFragment.reloadList()
                     triggerFileCreationNotification(file)
@@ -203,7 +201,7 @@ class RecursiveFileObserver(private val mPath: String,
     }
 
     fun updateLocationInDB(fileId: String, location: String) {
-        Instance.dbHelper.updateOnlyLocation(fileId, location ?: "")
+        Instance.dbHelper.updateOnlyLocation(fileId, location)
         explorerFragment.reloadList()
     }
 
